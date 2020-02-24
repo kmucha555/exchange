@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class CurrencyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Short id;
 
     @Column(length = 64)
     private String name;
@@ -20,5 +20,5 @@ public class CurrencyEntity {
     @Column(length = 3)
     private String code;
 
-    private int unit;
+    private short unit;
 }
