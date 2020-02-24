@@ -1,13 +1,12 @@
 package pl.mkjb.exchange.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
-@RequiredArgsConstructor
-@Getter
+@NoArgsConstructor
+@Data
 public class CurrencyBundle {
-    private final String publicationDate;
-    private final Set<Currency> items;
+    private String publicationDate;
+    private Set<Currency> items;
 }

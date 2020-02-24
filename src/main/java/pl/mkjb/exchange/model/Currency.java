@@ -1,15 +1,15 @@
 package pl.mkjb.exchange.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@RequiredArgsConstructor
-@Getter
+@NoArgsConstructor
+@Data
 public class Currency {
-    private final String name;
-    private final String code;
-    private final int unit;
-    private final String purchasePrice;
-    private final String sellPrice;
-    private final String averagePrice;
+    private String name;
+    private String code;
+    private int unit;
+    private String purchasePrice;
+    private String sellPrice;
+    private String averagePrice;
 }
