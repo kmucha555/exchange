@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @NoArgsConstructor
 @Data
-public class Currency {
+public class CurrencyModel {
     private String name;
     private String code;
     private int unit;

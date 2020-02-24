@@ -8,7 +8,7 @@ import java.util.Set;
 
 @NoArgsConstructor
 @Data
-public class CurrencyRates {
+public class CurrencyRatesModel {
     private LocalDateTime publicationDate;
-    private Set<Currency> items;
+    private Set<CurrencyModel> items;
 }

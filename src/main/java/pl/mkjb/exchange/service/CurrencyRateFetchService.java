@@ -7,8 +7,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
-import pl.mkjb.exchange.model.Currency;
-import pl.mkjb.exchange.model.CurrencyRates;
+import pl.mkjb.exchange.model.CurrencyModel;
+import pl.mkjb.exchange.model.CurrencyRatesModel;
 import pl.mkjb.exchange.repository.CurrencyRateRepository;
 import pl.mkjb.exchange.repository.CurrencyRepository;
 import pl.mkjb.exchange.restclient.RestClient;
@@ -27,36 +27,36 @@ public final class CurrencyRateFetchService {
 
     @Scheduled(fixedRate = 50000)
     private void updateCurrenciesRates() {
-        final CurrencyRates currenciesRates = futureProcessingRestClient.getCurrenciesRates();
+        final CurrencyRatesModel currenciesRates = futureProcessingRestClient.getCurrenciesRates();
         if (isNewCurrencyRateAvailable(currenciesRates)) {
             currencyRateRepository.saveAll(buildCurrencyRateEntity(currenciesRates));
             log.info("New exchange rates available. Saving to database.");
         }
     }
 
-    private Set<CurrencyRateEntity> buildCurrencyRateEntity(CurrencyRates currenciesRates) {
+    private Set<CurrencyRateEntity> buildCurrencyRateEntity(CurrencyRatesModel currenciesRates) {
         return currenciesRates.getItems()
                 .stream()
-                .map(currency -> CurrencyRateEntity.builder()
-                        .currencyEntity(getCurrencyEntity(currency))
-                        .averagePrice(currency.getAveragePrice())
-                        .purchasePrice(currency.getPurchasePrice())
-                        .sellPrice(currency.getSellPrice())
+                .map(currencyModel -> CurrencyRateEntity.builder()
+                        .currencyEntity(getCurrencyEntity(currencyModel))
+                        .averagePrice(currencyModel.getAveragePrice())
+                        .purchasePrice(currencyModel.getPurchasePrice())
+                        .sellPrice(currencyModel.getSellPrice())
                         .publicationDate(currenciesRates.getPublicationDate())
                         .build())
                 .collect(Collectors.toUnmodifiableSet());
     }
 
-    private CurrencyEntity getCurrencyEntity(Currency currency) {
-        return currencyRepository.findByCode(currency.getCode())
+    private CurrencyEntity getCurrencyEntity(CurrencyModel currencyModel) {
+        return currencyRepository.findByCode(currencyModel.getCode())
                 .getOrElse(() -> {
-                    log.error("Missing currency code {}", currency);
+                    log.error("Missing currency code {}", currencyModel);
                     throw new IllegalArgumentException("Missing currency code");
                 });
     }
 
-    private boolean isNewCurrencyRateAvailable(CurrencyRates currencyRates) {
-        final LocalDateTime publicationDate = currencyRates.getPublicationDate();
+    private boolean isNewCurrencyRateAvailable(CurrencyRatesModel currencyRatesModel) {
+        final LocalDateTime publicationDate = currencyRatesModel.getPublicationDate();
         return currencyRateRepository.countByPublicationDate(publicationDate) == 0;
     }
 }

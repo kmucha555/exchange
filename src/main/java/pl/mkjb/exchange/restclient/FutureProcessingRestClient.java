@@ -8,7 +8,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import pl.mkjb.exchange.model.CurrencyRates;
+import pl.mkjb.exchange.model.CurrencyRatesModel;
 
 @Log4j2
 @Component
@@ -20,8 +20,8 @@ public class FutureProcessingRestClient implements RestClient {
     private String currencyRatesUrl;
 
     @Override
-    public CurrencyRates getCurrenciesRates() {
-        final ResponseEntity<CurrencyRates> currencyRatesResponseEntity = restTemplate.getForEntity(currencyRatesUrl, CurrencyRates.class);
+    public CurrencyRatesModel getCurrenciesRates() {
+        final ResponseEntity<CurrencyRatesModel> currencyRatesResponseEntity = restTemplate.getForEntity(currencyRatesUrl, CurrencyRatesModel.class);
         return Option.of(currencyRatesResponseEntity)
                 .filter(this::isValidResponse)
                 .peek(log::info)
@@ -30,7 +30,7 @@ public class FutureProcessingRestClient implements RestClient {
                 .getOrElseThrow(() -> new IllegalStateException("Error during currencies rates fetch."));
     }
 
-    private boolean isValidResponse(ResponseEntity<CurrencyRates> currencyRatesResponseEntity) {
+    private boolean isValidResponse(ResponseEntity<CurrencyRatesModel> currencyRatesResponseEntity) {
         return !currencyRatesResponseEntity.getStatusCode().isError();
     }
 }
