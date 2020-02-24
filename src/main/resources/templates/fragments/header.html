@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="MESSAGE" type="pl.coderslab.util.Constant"*/-->
+<h3 class="h4 mb-2 text-danger" th:if="${MESSAGE}" th:text="${MESSAGE}"></h3>
 <header th:fragment="headerFragment" class="row row-cols-1 border-secondary border m-2 mb-5">
     <div class="form-group d-flex justify-content-between">
         <h1><a th:href="@{/}" class="m-2 text-danger text-">Exchange</a></h1>

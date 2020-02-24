@@ -1,14 +1,19 @@
 package pl.mkjb.exchange.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.mkjb.exchange.model.UserModel;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users", indexes = @Index(columnList = "user_name", unique = true))
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class UserEntity {
     @Id
@@ -36,5 +41,14 @@ public class UserEntity {
     public void prePersist() {
         this.active = Boolean.TRUE;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public static UserEntity fromModel(UserModel userModel) {
+        return UserEntity.builder()
+                .firstName(userModel.getFirstName())
+                .lastName(userModel.getLastName())
+                .username(userModel.getUserName())
+                .password(userModel.getPassword())
+                .build();
     }
 }

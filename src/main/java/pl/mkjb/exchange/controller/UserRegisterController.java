@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mkjb.exchange.model.UserModel;
+import pl.mkjb.exchange.service.UserService;
+import pl.mkjb.exchange.util.Constant;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -20,6 +22,8 @@ public class UserRegisterController {
     private static final String VIEW_NAME = "user-registration";
     private static final String REDIRECT_URL = "redirect:/";
     private static final String MODEL_NAME = "userModel";
+    private static final String MESSAGE = Constant.MESSAGE.name();
+    private final UserService userService;
 
     @GetMapping
     public ModelAndView show() {
@@ -31,17 +35,17 @@ public class UserRegisterController {
     public String save(@Valid UserModel userModel,
                        BindingResult bindingResult,
                        RedirectAttributes redirectAttributes) {
-//        if (userService.isGivenUserNameAlreadyUsed(userModel)) {
-//            bindingResult.rejectValue(
-//                    "userName", "error.user",
-//                    "Użytkownik o takim emailu jest już zarejestrowany"
-//            );
-//        }
+        if (userService.isGivenUserNameAlreadyUsed(userModel)) {
+            bindingResult.rejectValue(
+                    "userName", "error.user",
+                    "Username already used"
+            );
+        }
         if (bindingResult.hasErrors()) {
             return VIEW_NAME;
         }
-//        userService.save(userModel, ROLE_USER);
-//        redirectAttributes.addFlashAttribute(MESSAGE, "Użytkownik został zarejestrowany. Na adres e-mail wysłano link aktywacyjny");
+        userService.save(userModel);
+        redirectAttributes.addFlashAttribute(MESSAGE, "User has been registered");
         return REDIRECT_URL;
     }
 }
