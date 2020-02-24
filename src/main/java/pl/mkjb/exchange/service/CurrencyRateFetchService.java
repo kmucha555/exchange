@@ -1,5 +1,6 @@
 package pl.mkjb.exchange.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,24 +13,28 @@ import pl.mkjb.exchange.repository.CurrencyRateRepository;
 import pl.mkjb.exchange.repository.CurrencyRepository;
 import pl.mkjb.exchange.restclient.RestClient;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-public class CurrencyService {
-    private final RestClient restClient;
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CurrencyRateFetchService {
+    private final RestClient futureProcessingRestClient;
     private final CurrencyRateRepository currencyRateRepository;
     private final CurrencyRepository currencyRepository;
 
-    @Scheduled(fixedRate = 3000)
+    @Scheduled(fixedRate = 5000)
     private void updateCurrenciesRates() {
-        final CurrencyRates currenciesRates = restClient.getCurrenciesRates();
-        currencyRateRepository.saveAll(prepare(currenciesRates));
+        final CurrencyRates currenciesRates = futureProcessingRestClient.getCurrenciesRates();
+        if (isNewCurrencyRateAvailable(currenciesRates)) {
+            currencyRateRepository.saveAll(buildCurrencyRateEntity(currenciesRates));
+            log.info("New exchange rates available. Saving to database.");
+        }
     }
 
-    private Set<CurrencyRateEntity> prepare(CurrencyRates currenciesRates) {
+    private Set<CurrencyRateEntity> buildCurrencyRateEntity(CurrencyRates currenciesRates) {
         return currenciesRates.getItems()
                 .stream()
                 .map(currency -> CurrencyRateEntity.builder()
@@ -48,5 +53,10 @@ public class CurrencyService {
                     log.error("Missing currency code {}", currency);
                     throw new IllegalArgumentException("Missing currency code");
                 });
+    }
+
+    private boolean isNewCurrencyRateAvailable(CurrencyRates currencyRates) {
+        final LocalDateTime publicationDate = currencyRates.getPublicationDate();
+        return currencyRateRepository.countByPublicationDate(publicationDate) == 0;
     }
 }
