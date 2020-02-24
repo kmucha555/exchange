@@ -11,8 +11,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(staticName = "of")
+@AllArgsConstructor(staticName = "of")
 @Data
 @EqualFields(field = "password", fieldConfirm = "confirmPassword", fieldMatchName = "password")
 public class UserModel {

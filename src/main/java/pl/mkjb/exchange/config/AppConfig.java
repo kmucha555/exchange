@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.validation.Validator;
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class AppConfig implements WebMvcConfigurer {
@@ -33,13 +33,16 @@ public class AppConfig implements WebMvcConfigurer {
 
     @Bean
     public PasswordValidator getPasswordValidator() {
-        return new PasswordValidator(Arrays.asList(
-                new LengthRule(8, 30),
-                new CharacterRule(EnglishCharacterData.UpperCase, 1),
-                new CharacterRule(EnglishCharacterData.LowerCase, 1),
-                new CharacterRule(EnglishCharacterData.Digit, 1),
-                new CharacterRule(EnglishCharacterData.Special, 1),
-                new WhitespaceRule()));
+        return new PasswordValidator(
+                List.of(
+                        new LengthRule(8, 30),
+                        new CharacterRule(EnglishCharacterData.UpperCase, 1),
+                        new CharacterRule(EnglishCharacterData.LowerCase, 1),
+                        new CharacterRule(EnglishCharacterData.Digit, 1),
+                        new CharacterRule(EnglishCharacterData.Special, 1),
+                        new WhitespaceRule()
+                )
+        );
     }
 
     @Bean
