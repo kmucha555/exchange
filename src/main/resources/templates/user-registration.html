@@ -7,46 +7,48 @@
     <header th:replace="~{fragments/header :: headerFragment}">
     </header>
     <section>
-        <div class="row row-cols-1 border-secondary border m-2 mb-5">
+        <div class="row row-cols-1 border-success border m-2 mb-5">
             <div class="p-5">
-                <h4 class="text-danger text-left mt-10">Register new user</h4>
-                <!--/*@thymesVar id="userModel" type="pl.mkjb.exchange.model.UserModel"*/-->
-                <form method="post" th:action="@{/register}" th:object="${userModel}">
-                    <div class="form-group">
-                        <input class="form-control form-control-lg" type="text" th:field="*{userName}"
-                               th:value="*{userName}" placeholder="Username"/>
-                        <div class="text-danger text-left" th:if="${#fields.hasErrors('userName')}"
-                             th:errors="*{userName}"></div>
-                    </div>
-                    <div class="form-group">
-                        <input class="form-control form-control-lg" type="text" th:field="*{firstName}"
-                               th:value="*{firstName}" placeholder="First name"/>
-                        <div class="text-danger text-left" th:if="${#fields.hasErrors('firstName')}"
-                             th:errors="*{firstName}"></div>
-                    </div>
-                    <div class="form-group">
-                        <input class="form-control form-control-lg" type="text" th:field="*{lastName}"
-                               th:value="*{lastName}" placeholder="Last name"/>
-                        <div class="text-danger text-left" th:if="${#fields.hasErrors('lastName')}"
-                             th:errors="*{lastName}"></div>
-                    </div>
-                    <div class="form-group">
-                        <input class="form-control form-control-lg" type="password" th:field="*{password}"
-                               placeholder="Password"/>
-                        <div class="text-danger text-left" th:if="${#fields.hasErrors('password')}"
-                             th:errors="*{password}"></div>
-                    </div>
-                    <div class="form-group">
-                        <input class="form-control form-control-lg" type="password" th:field="*{confirmPassword}"
-                               placeholder="Confirm Password"/>
-                        <div class="text-danger text-left" th:if="${#fields.hasErrors('confirmPassword')}"
-                             th:errors="*{confirmPassword}"></div>
-                    </div>
-                    <div class="form-group d-flex justify-content-between">
-                        <a th:href="@{/}" class="btn btn-link" type="button">Back to homepage</a>
-                        <input class="btn btn-success" type="submit" value="Sign Up"/>
-                    </div>
-                </form>
+                <div class="w-50 mx-auto">
+                    <h3 class="text-success text-left mt-10">Register new user</h3>
+                    <!--/*@thymesVar id="userModel" type="pl.mkjb.exchange.model.UserModel"*/-->
+                    <form method="post" th:action="@{/register}" th:object="${userModel}">
+                        <div class="form-group">
+                            <input class="form-control form-control-lg" type="text" th:field="*{userName}"
+                                   th:value="*{userName}" placeholder="Username"/>
+                            <div class="text-danger text-left" th:if="${#fields.hasErrors('userName')}"
+                                 th:errors="*{userName}"></div>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control form-control-lg" type="text" th:field="*{firstName}"
+                                   th:value="*{firstName}" placeholder="First name"/>
+                            <div class="text-danger text-left" th:if="${#fields.hasErrors('firstName')}"
+                                 th:errors="*{firstName}"></div>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control form-control-lg" type="text" th:field="*{lastName}"
+                                   th:value="*{lastName}" placeholder="Last name"/>
+                            <div class="text-danger text-left" th:if="${#fields.hasErrors('lastName')}"
+                                 th:errors="*{lastName}"></div>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control form-control-lg" type="password" th:field="*{password}"
+                                   placeholder="Password"/>
+                            <div class="text-danger text-left" th:if="${#fields.hasErrors('password')}"
+                                 th:errors="*{password}"></div>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control form-control-lg" type="password" th:field="*{confirmPassword}"
+                                   placeholder="Confirm Password"/>
+                            <div class="text-danger text-left" th:if="${#fields.hasErrors('confirmPassword')}"
+                                 th:errors="*{confirmPassword}"></div>
+                        </div>
+                        <div class="form-group d-flex justify-content-between">
+                            <a th:href="@{/}" class="btn btn-link" type="button">Back to homepage</a>
+                            <input class="btn btn-success" type="submit" value="Sign Up"/>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </section>

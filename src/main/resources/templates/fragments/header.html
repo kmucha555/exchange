@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<!--/*@thymesVar id="MESSAGE" type="pl.coderslab.util.Constant"*/-->
-<h3 class="h4 mb-2 text-danger" th:if="${MESSAGE}" th:text="${MESSAGE}"></h3>
-<header th:fragment="headerFragment" class="row row-cols-1 border-secondary border m-2 mb-5">
+<!--/*@thymesVar id="MESSAGE_SUCCESS" type="pl.mkjb.exchange.util.Constant"*/-->
+<div class="alert alert-success" role="alert" th:if="${MESSAGE_SUCCESS}" th:text="${MESSAGE_SUCCESS}"></div>
+<!--/*@thymesVar id="MESSAGE_FAILED" type="pl.mkjb.exchange.util.Constant"*/-->
+<div class="alert alert-danger" role="alert" th:if="${MESSAGE_FAILED}" th:text="${MESSAGE_FAILED}"></div>
+<header th:fragment="headerFragment" class="row row-cols-1 m-2 mb-2">
     <div class="form-group d-flex justify-content-between">
-        <h1><a th:href="@{/}" class="m-2 text-danger text-">Exchange</a></h1>
+        <h1><a th:href="@{/}" class="m-2 text-success text-">EXCHANGE</a></h1>
         <div>
             <a th:href="@{/login}" class="btn btn-warning m-2" type="button">Sign In</a>
             <a th:href="@{/register}" class="btn btn-success m-2" type="button">Sign Up</a>

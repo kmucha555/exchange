@@ -22,7 +22,7 @@ public class UserRegisterController {
     private static final String VIEW_NAME = "user-registration";
     private static final String REDIRECT_URL = "redirect:/";
     private static final String MODEL_NAME = "userModel";
-    private static final String MESSAGE = Constant.MESSAGE.name();
+    private static final String MESSAGE = Constant.MESSAGE_SUCCESS.name();
     private final UserService userService;
 
     @GetMapping
