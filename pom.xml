@@ -17,6 +17,7 @@
     <properties>
         <java.version>11</java.version>
         <vavr.version>0.10.2</vavr.version>
+        <passay.version>1.5.0</passay.version>
     </properties>
 
     <dependencies>
@@ -78,6 +79,11 @@
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
             <version>${vavr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.passay</groupId>
+            <artifactId>passay</artifactId>
+            <version>${passay.version}</version>
         </dependency>
     </dependencies>
 
