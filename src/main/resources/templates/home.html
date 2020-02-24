@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: headerFragment}">
+</head>
+<body>
+<div class="container-fluid mt-5">
+    <header class="row row-cols-1 w-75 border-secondary border mb-5">
+        <div class="form-group d-flex justify-content-between">
+            <h1><a th:href="@{/}" class="m-2 text-danger text-">Exchange</a></h1>
+            <div>
+                <a th:href="@{/login}" class="btn btn-warning m-2" type="button">Sign In</a>
+                <a th:href="@{/user/add}" class="btn btn-success m-2" type="button">Sign Up</a>
+            </div>
+        </div>
+    </header>
+    <section class="text-center">
+        <div class="row row-cols-2 w-75">
+            <div class="col border-secondary border">
+                <h5 class="text-left">Currencies</h5>
+            </div>
+            <div class="col border-secondary border">
+                <h5 class="text-left">My Wallet</h5>
+            </div>
+        </div>
+    </section>
+</div>
+<footer th:replace="~{fragments/footer :: footerFragment}">
+</footer>
+</body>
+</html>
