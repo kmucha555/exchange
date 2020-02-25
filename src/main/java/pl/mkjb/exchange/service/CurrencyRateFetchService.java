@@ -25,7 +25,7 @@ public final class CurrencyRateFetchService {
     private final CurrencyRateRepository currencyRateRepository;
     private final CurrencyRepository currencyRepository;
 
-    @Scheduled(fixedRate = 50000)
+    @Scheduled(fixedRate = 15000)
     private void updateCurrenciesRates() {
         final CurrencyRatesModel currenciesRates = futureProcessingRestClient.getCurrenciesRates();
         if (isNewCurrencyRateAvailable(currenciesRates)) {
