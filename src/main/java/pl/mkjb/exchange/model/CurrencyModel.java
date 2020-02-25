@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Data
 public class CurrencyModel {
+    private long id;
     private String name;
     private String code;
     private int unit;

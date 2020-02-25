@@ -10,6 +10,9 @@ $(document).ready(function () {
         "scrollX": false,
         "scrollY": false,
         "dom": '<"toolbar">frtip',
+        "columnDefs": [
+            {"className": "dt-center", "targets": "_all"}
+        ],
         ajax: {
             url: url,
             dataSrc: json => {
@@ -22,7 +25,7 @@ $(document).ready(function () {
                             'code': element.code,
                             'unit': element.unit,
                             'sellPrice': element.sellPrice,
-                            'purchasePrice': element.purchasePrice
+                            'action': `<a class="btn-sm btn-warning" href="/transaction/buy/${element.id}">Buy</a>`
                         }
                     )
                 );
@@ -33,7 +36,7 @@ $(document).ready(function () {
             {data: 'code'},
             {data: 'unit'},
             {data: 'sellPrice'},
-            {data: 'purchasePrice'}
+            {data: 'action'}
         ]
     });
     setInterval(() => currencies.ajax.reload(), 5000);

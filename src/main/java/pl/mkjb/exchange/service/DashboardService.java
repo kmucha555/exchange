@@ -23,13 +23,11 @@ public class DashboardService {
                                 .toJavaSet()))
                 .map(tuple2 -> CurrencyRatesModel.of(tuple2._1(), tuple2._2()))
                 .getOrElseThrow(() -> new IllegalArgumentException("No currency rates available."));
-//        return currencyRateRepository.findFirst6ByOrderByPublicationDateDesc()
-//                .map(this::buildCurrencyModel)
-//                .toJavaSet();
     }
 
     private CurrencyModel buildCurrencyModel(CurrencyRateEntity currencyRate) {
         return CurrencyModel.builder()
+                .id(currencyRate.getId())
                 .name(currencyRate.getCurrencyEntity().getName())
                 .code(currencyRate.getCurrencyEntity().getCode())
                 .unit(currencyRate.getCurrencyEntity().getUnit())
