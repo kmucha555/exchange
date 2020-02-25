@@ -14,11 +14,12 @@ public class CurrencyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Short id;
 
-    @Column(length = 64)
+    @Column(length = 64, nullable = false)
     private String name;
 
-    @Column(length = 3)
+    @Column(length = 3, nullable = false)
     private String code;
 
+    @Column(nullable = false)
     private short unit;
 }
