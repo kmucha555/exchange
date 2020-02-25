@@ -5,16 +5,17 @@ import io.vavr.collection.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
+import pl.mkjb.exchange.exception.ResourceNotFoundException;
 import pl.mkjb.exchange.model.CurrencyModel;
 import pl.mkjb.exchange.model.CurrencyRatesModel;
 import pl.mkjb.exchange.repository.CurrencyRateRepository;
 
 @Service
 @RequiredArgsConstructor
-public class DashboardService {
+public class CurrencyService {
     private final CurrencyRateRepository currencyRateRepository;
 
-    public CurrencyRatesModel findNewestRates() {
+    public CurrencyRatesModel getNewestRates() {
         final Set<CurrencyRateEntity> newestRates = currencyRateRepository.findFirst6ByOrderByPublicationDateDesc();
         return newestRates
                 .map(currencyRate -> Tuple.of(currencyRate.getPublicationDate(), newestRates))
@@ -22,7 +23,7 @@ public class DashboardService {
                         newestRate.map(this::buildCurrencyModel)
                                 .toJavaSet()))
                 .map(tuple2 -> CurrencyRatesModel.of(tuple2._1(), tuple2._2()))
-                .getOrElseThrow(() -> new IllegalArgumentException("No currency rates available."));
+                .getOrElseThrow(() -> new ResourceNotFoundException(CurrencyService.class, "No currency rates available."));
     }
 
     private CurrencyModel buildCurrencyModel(CurrencyRateEntity currencyRate) {

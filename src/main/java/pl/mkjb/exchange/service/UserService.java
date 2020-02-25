@@ -5,6 +5,7 @@ import lombok.val;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.UserEntity;
+import pl.mkjb.exchange.exception.ResourceNotFoundException;
 import pl.mkjb.exchange.model.UserModel;
 import pl.mkjb.exchange.repository.UserRepository;
 
@@ -24,5 +25,10 @@ public class UserService {
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         val userEntity = UserEntity.fromModel(userModel);
         userRepository.save(userEntity);
+    }
+
+    public UserEntity findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(WalletService.class, userId));
     }
 }
