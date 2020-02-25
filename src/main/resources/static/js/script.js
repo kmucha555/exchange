@@ -4,8 +4,8 @@ $(document).ready(function () {
 
     const currencies = $('#currencies')
         .on('error.dt', () => {
-            $("div.toolbar").html(`<p class="text-danger">System temporary unavailable</p>`);
-            $("#currencies").prop("disabled", true);
+            $("#lastUpdate").html(`<p class="text-danger">System temporary unavailable</p>`);
+            $("#currencies").find('a').hide();
         })
         .DataTable({
             'order': [[0, "asc"]],
@@ -24,7 +24,7 @@ $(document).ready(function () {
                 dataSrc: json => {
                     const returnData = [];
                     publicationDate = new Date(json.publicationDate);
-                    $("div.toolbar").html(`<small>Last updated: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}</small>`);
+                    $("#lastUpdate").html(`Last updated: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}`);
                     json.items.forEach(element =>
                         returnData.push(
                             {
@@ -48,8 +48,8 @@ $(document).ready(function () {
 
     const wallet = $('#wallet')
         .on('error.dt', () => {
-            $("#wallet div.toolbar").html(`<p class="text-danger">System temporary unavailable</p>`);
-            $("#wallet").prop("disabled", true);
+            $("#lastUpdate").html(`<p class="text-danger">System temporary unavailable</p>`);
+            $("#wallet").find('a').hide();
         })
         .DataTable({
             'order': [[0, "asc"]],
@@ -67,8 +67,6 @@ $(document).ready(function () {
                 url: window.location.href + '/wallet',
                 dataSrc: json => {
                     const returnData = [];
-                    publicationDate = new Date(json.publicationDate);
-                    $("#wallet div.toolbar").html(`<small>Last updated: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}</small>`);
                     json.forEach(element =>
                         returnData.push(
                             {
