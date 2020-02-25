@@ -1,12 +1,14 @@
 $(document).ready(function () {
     let publicationDate;
-    $.fn.dataTable.ext.errMode = 'none';
+
+    $.fn.dataTable.ext.errMode = (settings, techNote, message) => {
+        clearInterval(updateInterval);
+        $("#lastUpdate").html(`<h3 class="text-danger">System temporary unavailable</h3><h6 class="text-danger">${message}</h6>`);
+        $("#wallet").find('a').hide();
+        $("#currencies").find('a').hide();
+    };
 
     const currencies = $('#currencies')
-        .on('error.dt', () => {
-            $("#lastUpdate").html(`<p class="text-danger">System temporary unavailable</p>`);
-            $("#currencies").find('a').hide();
-        })
         .DataTable({
             'order': [[0, "asc"]],
             'paging': false,
@@ -24,13 +26,13 @@ $(document).ready(function () {
                 dataSrc: json => {
                     const returnData = [];
                     publicationDate = new Date(json.publicationDate);
-                    $("#lastUpdate").html(`Last updated: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}`);
+                    $("#lastUpdate").html(`Last update: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}`);
                     json.items.forEach(element =>
                         returnData.push(
                             {
                                 'code': element.code,
                                 'unit': element.unit,
-                                'sellPrice': element.sellPrice,
+                                'sellPrice': element.sellPrice.toFixed(4),
                                 'action': `<a class="btn-sm btn-warning" href="/transaction/buy/${element.id}">Buy</a>`
                             }
                         )
@@ -47,10 +49,6 @@ $(document).ready(function () {
         });
 
     const wallet = $('#wallet')
-        .on('error.dt', () => {
-            $("#lastUpdate").html(`<p class="text-danger">System temporary unavailable</p>`);
-            $("#wallet").find('a').hide();
-        })
         .DataTable({
             'order': [[0, "asc"]],
             'paging': false,
@@ -71,8 +69,8 @@ $(document).ready(function () {
                         returnData.push(
                             {
                                 'code': element.code,
-                                'amount': element.amount,
-                                'purchasePrice': element.purchasePrice,
+                                'amount': element.amount.toFixed(2),
+                                'purchasePrice': element.purchasePrice.toFixed(4),
                                 'value': (element.amount * element.purchasePrice).toFixed(2),
                                 'action': `<a class="btn-sm btn-danger" href="/transaction/sell/${element.currencyRateId}">Sell</a>`
                             }
@@ -90,7 +88,7 @@ $(document).ready(function () {
             ]
         });
 
-    setInterval(() => {
+    const updateInterval = setInterval(() => {
         currencies.ajax.reload();
         wallet.ajax.reload();
     }, 5000);
