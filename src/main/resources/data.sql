@@ -12,9 +12,9 @@ INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, curren
 INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (4, 5000000.00, '2020-02-25 16:03:40', 7.0380, 4, 1);
 INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (5, 5000000.00, '2020-02-25 16:03:40', 14.3227, 5, 1);
 INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (6, 50000.00, '2020-02-25 16:03:40', 5.7251, 6, 1);
-INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (1, 50000.00, '2020-02-25 16:03:40', 3.6907, 1, 2);
-INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (2, 50000.00, '2020-02-25 16:03:40', 3.9596, 2, 2);
-INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (3, 50000.00, '2020-02-25 16:03:40', 3.8238, 3, 2);
-INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (4, 5000000.00, '2020-02-25 16:03:40', 7.0380, 4, 2);
-INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (5, 5000000.00, '2020-02-25 16:03:40', 14.3227, 5, 2);
-INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (6, 50000.00, '2020-02-25 16:03:40', 5.7251, 6, 2);
+INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (7, 50000.00, '2020-02-25 16:03:40', 3.6907, 1, 2);
+INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (8, 50000.00, '2020-02-25 16:03:40', 3.9596, 2, 2);
+INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (9, 50000.00, '2020-02-25 16:03:40', 3.8238, 3, 2);
+INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (10, 5000000.00, '2020-02-25 16:03:40', 7.0380, 4, 2);
+INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (11, 5000000.00, '2020-02-25 16:03:40', 14.3227, 5, 2);
+INSERT INTO exchange.transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (12, 50000.00, '2020-02-25 16:03:40', 5.7251, 6, 2);

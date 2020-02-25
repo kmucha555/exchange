@@ -25,6 +25,7 @@ public class DashboardController {
     @ResponseBody
     @GetMapping("/currencies")
     public CurrencyRatesModel getAll() {
+
         return dashboardService.findNewestRates();
     }
 }
