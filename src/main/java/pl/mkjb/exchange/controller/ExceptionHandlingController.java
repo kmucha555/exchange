@@ -4,19 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import pl.mkjb.exchange.exception.ResourceNotFoundException;
+import pl.mkjb.exchange.exception.BadResourceException;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @ControllerAdvice
 public class ExceptionHandlingController {
-    private static final String LOG_MESSAGE = "Request: {} raised {}";
 
-    @ExceptionHandler({ResourceNotFoundException.class, IllegalArgumentException.class,
+    @ExceptionHandler({BadResourceException.class, IllegalArgumentException.class,
             UsernameNotFoundException.class})
-    public String handleException(HttpServletRequest request, Exception exception) {
-        log.error(LOG_MESSAGE, request.getRequestURL(), exception);
+    public String handleException(HttpServletRequest request, RuntimeException exception) {
+        log.error("Request: {} raised {}", request.getRequestURL(), exception.getMessage());
         return "errors/404";
     }
 }

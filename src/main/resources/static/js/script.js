@@ -2,7 +2,7 @@ $(document).ready(function () {
     let publicationDate;
 
     $.fn.dataTable.ext.errMode = (settings, techNote, message) => {
-        clearInterval(updateInterval);
+        // clearInterval(updateInterval);
         $("#lastUpdate").html(`<h3 class="text-danger">System temporary unavailable</h3><h6 class="text-danger">${message}</h6>`);
         $("#wallet").find('a').hide();
         $("#currencies").find('a').hide();

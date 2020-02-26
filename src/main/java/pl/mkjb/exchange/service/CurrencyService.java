@@ -5,7 +5,7 @@ import io.vavr.collection.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
-import pl.mkjb.exchange.exception.ResourceNotFoundException;
+import pl.mkjb.exchange.exception.BadResourceException;
 import pl.mkjb.exchange.model.CurrencyModel;
 import pl.mkjb.exchange.model.CurrencyRatesModel;
 import pl.mkjb.exchange.repository.CurrencyRateRepository;
@@ -23,7 +23,7 @@ public class CurrencyService {
                         newestRate.map(this::buildCurrencyModel)
                                 .toJavaSet()))
                 .map(tuple2 -> CurrencyRatesModel.of(tuple2._1(), tuple2._2()))
-                .getOrElseThrow(() -> new ResourceNotFoundException(CurrencyService.class, "No currency rates available."));
+                .getOrElseThrow(() -> new BadResourceException(CurrencyService.class, "No currency rates available."));
     }
 
     private CurrencyModel buildCurrencyModel(CurrencyRateEntity currencyRate) {

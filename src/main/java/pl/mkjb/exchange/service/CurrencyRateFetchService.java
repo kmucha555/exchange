@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CurrencyRateFetchService {
+public class CurrencyRateFetchService {
     private final RestClient futureProcessingRestClient;
     private final CurrencyRateRepository currencyRateRepository;
     private final CurrencyRepository currencyRepository;
 
-    @Scheduled(fixedRate = 15000)
+    @Scheduled(fixedRate = 5000)
     private void updateCurrenciesRates() {
         final CurrencyRatesModel currenciesRates = futureProcessingRestClient.getCurrenciesRates();
         if (isNewCurrencyRateAvailable(currenciesRates)) {
