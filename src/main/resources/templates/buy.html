@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: headFragment}">
+</head>
+<body>
+<div class="container-fluid mt-5">
+    <header th:replace="~{fragments/header :: headerFragment}">
+    </header>
+    <section>
+        <div class="row row-cols-1 border-secondary border m-2 mb-5">
+            <div class="p-5">
+                <div class="w-50 mx-auto">
+                    <h3 class="text-success text-left mt-10">Buy</h3>
+                    <!--/*@thymesVar id="transactionBuyModel" type="pl.mkjb.exchange.model.TransactionBuyModel"*/-->
+                    <form class="mt-5" method="post" th:action="@{/transaction/buy}" th:object="${transactionBuyModel}">
+                        <h4 th:text="'Wallet amount: ' + *{userWalletAmount} + ' PLN'"></h4>
+                        <div class="form-group mt-3">
+                            <input class="form-control form-control-lg" th:type="number" th:field="*{buyAmount}"
+                                   th:min="*{currencyUnit}"
+                                   th:max="*{maxAmountOfCurrencyForBuyByUser}"
+                                   th:step="*{currencyUnit % 10 == 0} ? '10' : '1'"
+                                   th:placeholder="'Enter ' + *{currencyCode} + ' amount'"/>
+                        </div>
+                        <h4 th:text="'Your Currency rate: ' + *{currencyUnit} + ' ' +
+                         *{currencyCode} + ' = ' + *{sellPrice} + ' PLN'"></h4>
+
+                        <h4 th:text="'Transaction limit [min - max]: ' + *{currencyUnit} + ' - ' +
+                         *{maxAmountOfCurrencyForBuyByUser} + ' ' + *{currencyCode}"></h4>
+                        <div class="form-group text-center pt-5">
+                            <input class="btn btn-lg btn-block btn-warning" type="submit" value="Buy"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+    </section>
+</div>
+<footer th:replace="~{fragments/footer :: footerFragment}">
+</footer>
+</body>
+</html>

@@ -8,4 +8,5 @@ import pl.mkjb.exchange.entity.CurrencyEntity;
 @Repository
 public interface CurrencyRepository extends CrudRepository<CurrencyEntity, Integer> {
     Option<CurrencyEntity> findByCode(String currencyCode);
+    Option<CurrencyEntity> findByBaseCurrencyIsTrue();
 }

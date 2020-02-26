@@ -53,6 +53,7 @@ public class FutureProcessingRestClient implements RestClient {
 
     @Override
     public boolean isConnectionAlive() {
+        log.info("Is Future Processing API alive: {}", activeConnection.get());
         return activeConnection.get();
     }
 }

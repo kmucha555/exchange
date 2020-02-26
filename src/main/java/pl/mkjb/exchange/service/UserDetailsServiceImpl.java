@@ -2,15 +2,18 @@ package pl.mkjb.exchange.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import pl.mkjb.exchange.entity.RoleEntity;
 import pl.mkjb.exchange.repository.UserRepository;
 import pl.mkjb.exchange.security.CustomAuthenticatedUser;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,11 +33,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         .accountNonExpired(true)
                         .credentialsNonExpired(true)
                         .accountNonLocked(true)
-                        .authorities(Set.of(new SimpleGrantedAuthority("ROLE_USER")))
+                        .authorities(getUserAuthority(user.getRoles()))
                         .build())
                 .orElseThrow(() -> {
                     log.error("Given username not found: {}", username);
                     throw new UsernameNotFoundException("Given username not found: " + username);
                 });
+    }
+
+    private Set<GrantedAuthority> getUserAuthority(Set<RoleEntity> userRoles) {
+        return userRoles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRole()))
+                .collect(Collectors.toUnmodifiableSet());
     }
 }

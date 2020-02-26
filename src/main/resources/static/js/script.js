@@ -33,7 +33,7 @@ $(document).ready(function () {
                                 'code': element.code,
                                 'unit': element.unit,
                                 'sellPrice': element.sellPrice.toFixed(4),
-                                'action': `<a class="btn-sm btn-warning" href="/transaction/buy/${element.id}">Buy</a>`
+                                'action': `<a class="btn-sm btn-warning" href="/transaction/buy/${element.currencyRateId}">Buy</a>`
                             }
                         )
                     );

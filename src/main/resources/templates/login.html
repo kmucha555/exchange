@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: headFragment}">
 </head>
 <body>
@@ -9,7 +9,7 @@
     <section>
         <div class="row row-cols-1 border-secondary border m-2 mb-5">
             <div class="p-5">
-                <div class="w-50 mx-auto">
+                <div class="w-50 mx-auto" sec:authorize="!isAuthenticated()">
                     <h3 class="text-success text-left mt-10">Sign In</h3>
                     <form method="post" th:action="@{/login}">
                         <div class="form-group" th:if="${param.error}">
@@ -31,6 +31,11 @@
                         </div>
                     </form>
                 </div>
+
+                <div class="w-100 text-center" sec:authorize="isAuthenticated()">
+                    <a th:href="@{/dashboard}" class="text-warning"><h1>OPEN DASHBOARD</h1></a>
+                </div>
+
             </div>
     </section>
 </div>

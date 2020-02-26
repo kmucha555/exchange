@@ -8,6 +8,8 @@ import pl.mkjb.exchange.model.UserModel;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", indexes = @Index(columnList = "user_name", unique = true))
@@ -34,6 +36,11 @@ public class UserEntity {
 
     @Column(length = 60)
     private String password;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Set<RoleEntity> roles = new HashSet<>();
 
     private LocalDateTime createdAt;
 
