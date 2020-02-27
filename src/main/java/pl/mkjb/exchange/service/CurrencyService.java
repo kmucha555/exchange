@@ -22,7 +22,7 @@ public class CurrencyService {
     private final CurrencyRateRepository currencyRateRepository;
 
     public CurrencyRatesModel getNewestRates() {
-        final Set<CurrencyRateEntity> newestRates = currencyRateRepository.findFirst6ByOrderByPublicationDateDesc();
+        final Set<CurrencyRateEntity> newestRates = currencyRateRepository.findByActiveTrue();
         return newestRates
                 .map(currencyRate -> Tuple.of(currencyRate.getPublicationDate(), newestRates))
                 .map(tuple2 -> tuple2.map2(newestRate ->

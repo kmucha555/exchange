@@ -25,10 +25,11 @@ public class CurrencyRateFetchService {
     private final CurrencyRateRepository currencyRateRepository;
     private final CurrencyRepository currencyRepository;
 
-    @Scheduled(fixedRate = 50000)
+    @Scheduled(fixedRate = 5000)
     private void updateCurrenciesRates() {
         final CurrencyRatesModel currenciesRates = futureProcessingRestClient.getCurrenciesRates();
         if (isNewCurrencyRateAvailable(currenciesRates)) {
+            currencyRateRepository.archiveCurrencyRates();
             currencyRateRepository.saveAll(buildCurrencyRateEntity(currenciesRates));
             log.info("New exchange rates available. Saving to database.");
         }
