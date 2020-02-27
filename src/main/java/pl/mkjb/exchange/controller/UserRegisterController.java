@@ -1,6 +1,7 @@
 package pl.mkjb.exchange.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,9 @@ import java.util.Map;
 @RequestMapping("/register")
 @RequiredArgsConstructor
 public class UserRegisterController {
+    @Value("${pl.mkjb.exchange.controller.UserExists.message}")
+    private String userExistsMessage;
+
     private static final String VIEW_NAME = "user-registration";
     private static final String REDIRECT_URL = "redirect:/";
     private static final String MODEL_NAME = "userModel";
@@ -45,7 +49,7 @@ public class UserRegisterController {
             return VIEW_NAME;
         }
         userService.save(userModel);
-        redirectAttributes.addFlashAttribute(MESSAGE, "User has been registered");
+        redirectAttributes.addFlashAttribute(MESSAGE, userExistsMessage);
         return REDIRECT_URL;
     }
 }

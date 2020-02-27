@@ -25,7 +25,7 @@ public class FutureProcessingRestClient implements RestClient {
     private static final Duration TIMEOUT = Duration.ofSeconds(1L);
     private final RestTemplateBuilder restTemplateBuilder;
 
-    @Value("${currency.rates.url}")
+    @Value("${pl.mkjb.exchange.restclient.api.url}")
     private String currencyRatesUrl;
 
     @Override

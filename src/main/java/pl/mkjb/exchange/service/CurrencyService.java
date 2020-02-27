@@ -2,6 +2,7 @@ package pl.mkjb.exchange.service;
 
 import io.vavr.Tuple;
 import io.vavr.collection.Set;
+import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
@@ -40,5 +41,10 @@ public class CurrencyService {
     public CurrencyEntity findBaseCurrency() {
         return currencyRepository.findByBaseCurrencyIsTrue()
                 .getOrElseThrow(() -> new BadResourceException("No base currency found"));
+    }
+
+    public boolean isValidCurrencyRateId(UUID currencyId) {
+        return Option.ofOptional(currencyRateRepository.findById(currencyId))
+                .isDefined();
     }
 }
