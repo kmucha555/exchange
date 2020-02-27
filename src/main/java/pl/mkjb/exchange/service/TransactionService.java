@@ -26,7 +26,7 @@ public class TransactionService implements Transaction {
 
     @Override
     public boolean hasErrors(TransactionModel transactionModel, long userId) {
-        if (!currencyService.isValidCurrencyRate(transactionModel.getCurrencyRateId())) {
+        if (currencyService.isArchivedCurrencyRate(transactionModel.getCurrencyRateId())) {
             return true;
         }
         val currencyModel = currencyService.findCurrencyByCurrencyRate(transactionModel.getCurrencyRateId());

@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mkjb.exchange.model.TransactionModel;
 import pl.mkjb.exchange.security.CustomAuthenticatedUser;
+import pl.mkjb.exchange.service.CurrencyService;
 import pl.mkjb.exchange.service.Transaction;
+import pl.mkjb.exchange.util.Constant;
 
 import javax.validation.Valid;
-import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -26,22 +26,34 @@ import java.util.UUID;
 public class TransactionBuyController {
     @Value("${pl.mkjb.exchange.controller.WrongAmount.message}")
     private String wrongAmount;
-
+    private static final String MESSAGE_SUCCESS = Constant.MESSAGE_SUCCESS.name();
+    private static final String MESSAGE_FAILED = Constant.MESSAGE_FAILED.name();
     private static final String VIEW_NAME = "buy";
     private static final String MODEL_NAME = "transactionModel";
+    private static final String REDIRECT_URL = "redirect:/dashboard";
     private final Transaction transactionService;
+    private final CurrencyService currencyService;
 
     @GetMapping("/buy/{currencyRateId}")
-    public ModelAndView showBuyForm(@PathVariable UUID currencyRateId, @AuthenticationPrincipal CustomAuthenticatedUser authenticatedUser) {
-        return new ModelAndView(VIEW_NAME, Map.of(MODEL_NAME, transactionService.getTransactionModel(currencyRateId, authenticatedUser.getId())));
+    public String showBuyForm(@PathVariable UUID currencyRateId,
+                              Model model,
+                              RedirectAttributes redirectAttributes,
+                              @AuthenticationPrincipal CustomAuthenticatedUser authenticatedUser) {
+
+        if (currencyService.isArchivedCurrencyRate(currencyRateId)) {
+            redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Given currency rate has been archived");
+            return REDIRECT_URL;
+        }
+        model.addAttribute(MODEL_NAME, transactionService.getTransactionModel(currencyRateId, authenticatedUser.getId()));
+        return VIEW_NAME;
     }
 
     @PostMapping("/buy")
     public String buyCurrency(@Valid TransactionModel transactionModel,
                               BindingResult bindingResult,
                               RedirectAttributes redirectAttributes,
-                              Model model,
                               @AuthenticationPrincipal CustomAuthenticatedUser authenticatedUser) {
+
         if (bindingResult.hasErrors()) {
             return VIEW_NAME;
         }
@@ -49,7 +61,11 @@ public class TransactionBuyController {
             bindingResult.rejectValue("buyAmount", "error.user", wrongAmount);
             return VIEW_NAME;
         }
+
         transactionService.saveTransaction(transactionModel, authenticatedUser.getId());
-        return "redirect:/dashboard";
+        redirectAttributes.addFlashAttribute(MESSAGE_SUCCESS,
+                String.format("Success! You bought %s %s", transactionModel.getTransactionAmount(), transactionModel.getCurrencyCode()));
+
+        return REDIRECT_URL;
     }
 }

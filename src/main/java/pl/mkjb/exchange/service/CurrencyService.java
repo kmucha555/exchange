@@ -2,8 +2,8 @@ package pl.mkjb.exchange.service;
 
 import io.vavr.Tuple;
 import io.vavr.collection.Set;
-import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
@@ -15,6 +15,7 @@ import pl.mkjb.exchange.repository.CurrencyRepository;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CurrencyService {
@@ -48,8 +49,9 @@ public class CurrencyService {
                 .getOrElseThrow(() -> new BadResourceException("No base currency found"));
     }
 
-    public boolean isValidCurrencyRate(UUID currencyId) {
-        return Option.ofOptional(currencyRateRepository.findById(currencyId))
-                .isDefined();
+    public boolean isArchivedCurrencyRate(UUID id) {
+        return !currencyRateRepository.findById(id)
+                .map(CurrencyRateEntity::getActive)
+                .orElseThrow(() -> new BadResourceException("Given currency rate id is invalid: " + id));
     }
 }
