@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
 import pl.mkjb.exchange.entity.UserEntity;
+import pl.mkjb.exchange.model.TModel;
 import pl.mkjb.exchange.model.TransactionModel;
 import pl.mkjb.exchange.repository.TransactionRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
+
+import static pl.mkjb.exchange.util.TransactionType.BUY;
 
 @Slf4j
 @Service
@@ -75,7 +78,13 @@ public class TransactionBuyService implements Transaction {
     @Transactional
     public void saveTransaction(TransactionModel transactionModel, long userId) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
-        val transactionAmount = transactionModel.getTransactionAmount();
-        exchangeService.saveTransaction(currencyRateEntity, transactionAmount, userId);
+        final TModel tModel = TModel.builder()
+                .currencyRateEntity(currencyRateEntity)
+                .transactionAmount(transactionModel.getTransactionAmount())
+                .transactionPrice(currencyRateEntity.getSellPrice())
+                .userId(userId)
+                .transactionType(BUY)
+                .build();
+        exchangeService.saveTransaction(tModel);
     }
 }

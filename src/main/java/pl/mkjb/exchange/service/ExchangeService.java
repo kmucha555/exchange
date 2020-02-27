@@ -4,9 +4,9 @@ import io.vavr.Function4;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
-import pl.mkjb.exchange.entity.CurrencyRateEntity;
 import pl.mkjb.exchange.entity.TransactionEntity;
 import pl.mkjb.exchange.entity.UserEntity;
+import pl.mkjb.exchange.model.TModel;
 import pl.mkjb.exchange.repository.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -21,38 +21,39 @@ public class ExchangeService {
     private final UserService userService;
     private final CurrencyService currencyService;
 
-    public void saveTransaction(CurrencyRateEntity currencyRateEntity, BigDecimal transactionCurrencyAmount, long userId) {
+    public void saveTransaction(TModel tModel) {
         final CurrencyEntity baseCurrencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
-        final CurrencyEntity currencyEntity = currencyService.findCurrencyById(currencyRateEntity.getCurrencyEntity().getId());
+        final CurrencyEntity currencyEntity = currencyService.findCurrencyById(tModel.getCurrencyRateEntity().getCurrencyEntity().getId());
         final UserEntity exchangeOwner = userService.findOwner();
-        final UserEntity userEntity = userService.findById(userId);
-        BigDecimal transactionBaseCurrencyAmount = transactionCurrencyAmount.multiply(currencyRateEntity.getSellPrice())
+        final UserEntity userEntity = userService.findById(tModel.getUserId());
+
+        BigDecimal transactionBaseCurrencyAmount = tModel.getTransactionAmount().multiply(tModel.getTransactionPrice())
                 .divide(BigDecimal.valueOf(currencyEntity.getUnit()), HALF_UP);
 
         final Set<TransactionEntity> transactionEntities = Set.of(
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         userEntity,
-                        transactionCurrencyAmount,
-                        currencyRateEntity.getSellPrice()),
+                        tModel.getTransactionAmount(),
+                        tModel.getCurrencyRateEntity().getSellPrice()),
 
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         exchangeOwner,
-                        transactionCurrencyAmount.negate(),
-                        currencyRateEntity.getSellPrice()),
+                        tModel.getTransactionAmount().negate(),
+                        tModel.getCurrencyRateEntity().getSellPrice()),
 
                 prepareTransactionEntity().apply(
                         baseCurrencyEntity,
                         userEntity,
                         transactionBaseCurrencyAmount.negate(),
-                        currencyRateEntity.getSellPrice()),
+                        tModel.getCurrencyRateEntity().getSellPrice()),
 
                 prepareTransactionEntity().apply(
                         baseCurrencyEntity,
                         exchangeOwner,
                         transactionBaseCurrencyAmount,
-                        currencyRateEntity.getSellPrice()));
+                        tModel.getCurrencyRateEntity().getSellPrice()));
 
         save(transactionEntities);
     }

@@ -15,7 +15,7 @@ import pl.mkjb.exchange.model.TransactionModel;
 import pl.mkjb.exchange.security.CustomAuthenticatedUser;
 import pl.mkjb.exchange.service.CurrencyService;
 import pl.mkjb.exchange.service.Transaction;
-import pl.mkjb.exchange.util.Constant;
+import pl.mkjb.exchange.util.Message;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -26,8 +26,8 @@ import java.util.UUID;
 public class TransactionBuyController {
     @Value("${pl.mkjb.exchange.controller.WrongAmount.message}")
     private String wrongAmount;
-    private static final String MESSAGE_SUCCESS = Constant.MESSAGE_SUCCESS.name();
-    private static final String MESSAGE_FAILED = Constant.MESSAGE_FAILED.name();
+    private static final String MESSAGE_SUCCESS = Message.MESSAGE_SUCCESS.name();
+    private static final String MESSAGE_FAILED = Message.MESSAGE_FAILED.name();
     private static final String VIEW_NAME = "buy";
     private static final String MODEL_NAME = "transactionModel";
     private static final String REDIRECT_URL = "redirect:/dashboard";
