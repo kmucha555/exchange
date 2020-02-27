@@ -3,7 +3,6 @@ package pl.mkjb.exchange.service;
 import io.vavr.Tuple;
 import io.vavr.collection.Set;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
@@ -13,9 +12,9 @@ import pl.mkjb.exchange.model.CurrencyRatesModel;
 import pl.mkjb.exchange.repository.CurrencyRateRepository;
 import pl.mkjb.exchange.repository.CurrencyRepository;
 
+import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CurrencyService {
@@ -31,6 +30,10 @@ public class CurrencyService {
                                 .toJavaSet()))
                 .map(tuple2 -> CurrencyRatesModel.of(tuple2._1(), tuple2._2()))
                 .getOrElseThrow(() -> new BadResourceException(CurrencyService.class, "No currency rates available."));
+    }
+
+    public List<CurrencyEntity> findAll() {
+        return currencyRepository.findAll();
     }
 
     public CurrencyEntity findCurrencyById(int id) {
