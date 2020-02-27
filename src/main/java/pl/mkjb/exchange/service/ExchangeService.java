@@ -8,6 +8,7 @@ import pl.mkjb.exchange.entity.TransactionEntity;
 import pl.mkjb.exchange.entity.UserEntity;
 import pl.mkjb.exchange.model.TModel;
 import pl.mkjb.exchange.repository.TransactionRepository;
+import pl.mkjb.exchange.util.TransactionType;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -27,35 +28,43 @@ public class ExchangeService {
         final UserEntity exchangeOwner = userService.findOwner();
         final UserEntity userEntity = userService.findById(tModel.getUserId());
 
-        BigDecimal transactionBaseCurrencyAmount = tModel.getTransactionAmount().multiply(tModel.getTransactionPrice())
-                .divide(BigDecimal.valueOf(currencyEntity.getUnit()), HALF_UP);
+        BigDecimal transactionBaseCurrencyAmount = calculateBaseCurrencyAmount(tModel, currencyEntity);
 
         final Set<TransactionEntity> transactionEntities = Set.of(
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         userEntity,
                         tModel.getTransactionPrice(),
-                        tModel.getTransactionAmount()),
+                        tModel.getTransactionType().equals(TransactionType.BUY) ?
+                                tModel.getTransactionAmount() : tModel.getTransactionAmount().negate()),
 
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         exchangeOwner,
                         tModel.getTransactionPrice(),
-                        tModel.getTransactionAmount().negate()),
+                        tModel.getTransactionType().equals(TransactionType.BUY) ?
+                                tModel.getTransactionAmount().negate() : tModel.getTransactionAmount()),
 
                 prepareTransactionEntity().apply(
                         baseCurrencyEntity,
                         userEntity,
                         tModel.getTransactionPrice(),
-                        transactionBaseCurrencyAmount.negate()),
+                        tModel.getTransactionType().equals(TransactionType.BUY) ?
+                                transactionBaseCurrencyAmount.negate() : transactionBaseCurrencyAmount),
 
                 prepareTransactionEntity().apply(
                         baseCurrencyEntity,
                         exchangeOwner,
                         tModel.getTransactionPrice(),
-                        transactionBaseCurrencyAmount));
+                        tModel.getTransactionType().equals(TransactionType.BUY) ?
+                                transactionBaseCurrencyAmount : transactionBaseCurrencyAmount.negate()));
 
         save(transactionEntities);
+    }
+
+    private BigDecimal calculateBaseCurrencyAmount(TModel tModel, CurrencyEntity currencyEntity) {
+        return tModel.getTransactionAmount().multiply(tModel.getTransactionPrice())
+                .divide(BigDecimal.valueOf(currencyEntity.getUnit()), HALF_UP);
     }
 
     private Function4<CurrencyEntity, UserEntity, BigDecimal, BigDecimal, TransactionEntity> prepareTransactionEntity() {
