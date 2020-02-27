@@ -11,23 +11,23 @@
             <div class="p-5">
                 <div class="w-50 mx-auto">
                     <h3 class="text-success text-left mt-10">Buy</h3>
-                    <!--/*@thymesVar id="transactionBuyModel" type="pl.mkjb.exchange.model.TransactionBuyModel"*/-->
-                    <form class="mt-5" method="post" th:action="@{/transaction/buy}" th:object="${transactionBuyModel}">
+                    <!--/*@thymesVar id="transactionModel" type="pl.mkjb.exchange.model.TransactionModel"*/-->
+                    <form class="mt-5" method="post" th:action="@{/transaction/buy}" th:object="${transactionModel}">
                         <h4 th:text="'Wallet amount: ' + *{userWalletAmount} + ' PLN'"></h4>
-                        <div class="text-danger text-left" th:if="${#fields.hasErrors('buyAmount')}"
-                             th:errors="*{buyAmount}"></div>
+                        <div class="text-danger text-left" th:if="${#fields.hasErrors('transactionAmount')}"
+                             th:errors="*{transactionAmount}"></div>
                         <div class="form-group mt-3">
-                            <input class="form-control form-control-lg" th:type="number" th:field="*{buyAmount}"/>
-<!--                                   th:min="*{currencyUnit}"-->
-<!--                                   th:max="*{maxAmountOfCurrencyForBuyByUser}"-->
-<!--                                   th:step="*{currencyUnit}"-->
-<!--                                   th:placeholder="'Enter ' + *{currencyCode} + ' amount'"/>-->
+                            <input class="form-control form-control-lg" th:type="number" th:field="*{transactionAmount}"
+                                   th:min="*{currencyUnit}"
+                                   th:max="*{maxAllowedTransactionAmount}"
+                                   th:step="*{currencyUnit}"
+                                   th:placeholder="'Enter ' + *{currencyCode} + ' amount'"/>
                         </div>
                         <h4 th:text="'Your Currency rate: ' + *{currencyUnit} + ' ' +
-                         *{currencyCode} + ' = ' + *{sellPrice} + ' PLN'"></h4>
+                         *{currencyCode} + ' = ' + *{transactionPrice} + ' PLN'"></h4>
 
                         <h4 th:text="'Transaction limit [min - max]: ' + *{currencyUnit} + ' - ' +
-                         *{maxAmountOfCurrencyForBuyByUser} + ' ' + *{currencyCode}"></h4>
+                         *{maxAllowedTransactionAmount} + ' ' + *{currencyCode}"></h4>
                         <div class="form-group text-center pt-5">
                             <input class="btn btn-lg btn-block btn-warning" type="submit" value="Buy"/>
                         </div>
@@ -35,8 +35,8 @@
                         <input th:type="hidden" th:field="*{currencyUnit}" th:value="*{currencyUnit}">
                         <input th:type="hidden" th:field="*{currencyCode}" th:value="*{currencyCode}">
                         <input th:type="hidden" th:field="*{userWalletAmount}" th:value="*{userWalletAmount}">
-                        <input th:type="hidden" th:field="*{maxAmountOfCurrencyForBuyByUser}" th:value="*{maxAmountOfCurrencyForBuyByUser}">
-                        <input th:type="hidden" th:field="*{sellPrice}" th:value="*{sellPrice}">
+                        <input th:type="hidden" th:field="*{maxAllowedTransactionAmount}" th:value="*{maxAllowedTransactionAmount}">
+                        <input th:type="hidden" th:field="*{transactionPrice}" th:value="*{transactionPrice}">
                     </form>
                 </div>
             </div>

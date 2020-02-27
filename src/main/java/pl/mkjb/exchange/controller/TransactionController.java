@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import pl.mkjb.exchange.model.TransactionBuyModel;
+import pl.mkjb.exchange.model.TransactionModel;
 import pl.mkjb.exchange.security.CustomAuthenticatedUser;
-import pl.mkjb.exchange.service.TransactionService;
+import pl.mkjb.exchange.service.Transaction;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -28,16 +28,16 @@ public class TransactionController {
     private String wrongAmount;
 
     private static final String VIEW_NAME = "buy";
-    private static final String MODEL_NAME = "transactionBuyModel";
-    private final TransactionService transactionService;
+    private static final String MODEL_NAME = "transactionModel";
+    private final Transaction transactionService;
 
     @GetMapping("/buy/{currencyRateId}")
     public ModelAndView showBuyForm(@PathVariable UUID currencyRateId, @AuthenticationPrincipal CustomAuthenticatedUser authenticatedUser) {
-        return new ModelAndView(VIEW_NAME, Map.of(MODEL_NAME, transactionService.getTransactionBuyModel(currencyRateId, authenticatedUser.getId())));
+        return new ModelAndView(VIEW_NAME, Map.of(MODEL_NAME, transactionService.getTransactionModel(currencyRateId, authenticatedUser.getId())));
     }
 
     @PostMapping("/buy")
-    public String buyCurrency(@Valid TransactionBuyModel transactionBuyModel,
+    public String buyCurrency(@Valid TransactionModel transactionModel,
                               BindingResult bindingResult,
                               RedirectAttributes redirectAttributes,
                               Model model,
@@ -45,7 +45,7 @@ public class TransactionController {
         if (bindingResult.hasErrors()) {
             return VIEW_NAME;
         }
-        if (transactionService.hasErrors(transactionBuyModel, authenticatedUser.getId())) {
+        if (transactionService.hasErrors(transactionModel, authenticatedUser.getId())) {
             bindingResult.rejectValue("buyAmount", "error.user", wrongAmount);
             return VIEW_NAME;
         }

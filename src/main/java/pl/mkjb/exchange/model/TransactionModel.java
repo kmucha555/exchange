@@ -13,15 +13,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class TransactionBuyModel {
+public class TransactionModel {
     private UUID currencyRateId;
     private String currencyCode;
     private int currencyUnit;
-    private BigDecimal sellPrice;
+    private BigDecimal transactionPrice;
     private BigDecimal userWalletAmount;
 
     @NotNull
-    private BigDecimal buyAmount;
+    private BigDecimal transactionAmount;
 
-    private BigDecimal maxAmountOfCurrencyForBuyByUser;
+    private BigDecimal maxAllowedTransactionAmount;
 }
