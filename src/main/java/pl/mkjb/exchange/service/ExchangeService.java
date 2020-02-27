@@ -34,37 +34,37 @@ public class ExchangeService {
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         userEntity,
-                        tModel.getTransactionAmount(),
-                        tModel.getCurrencyRateEntity().getSellPrice()),
+                        tModel.getTransactionPrice(),
+                        tModel.getTransactionAmount()),
 
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         exchangeOwner,
-                        tModel.getTransactionAmount().negate(),
-                        tModel.getCurrencyRateEntity().getSellPrice()),
+                        tModel.getTransactionPrice(),
+                        tModel.getTransactionAmount().negate()),
 
                 prepareTransactionEntity().apply(
                         baseCurrencyEntity,
                         userEntity,
-                        transactionBaseCurrencyAmount.negate(),
-                        tModel.getCurrencyRateEntity().getSellPrice()),
+                        tModel.getTransactionPrice(),
+                        transactionBaseCurrencyAmount.negate()),
 
                 prepareTransactionEntity().apply(
                         baseCurrencyEntity,
                         exchangeOwner,
-                        transactionBaseCurrencyAmount,
-                        tModel.getCurrencyRateEntity().getSellPrice()));
+                        tModel.getTransactionPrice(),
+                        transactionBaseCurrencyAmount));
 
         save(transactionEntities);
     }
 
     private Function4<CurrencyEntity, UserEntity, BigDecimal, BigDecimal, TransactionEntity> prepareTransactionEntity() {
-        return (currencyEntity, userEntity, amount, transactionPrice) ->
+        return (currencyEntity, userEntity, transactionPrice, amount) ->
                 TransactionEntity.builder()
                         .currencyEntity(currencyEntity)
                         .userEntity(userEntity)
-                        .amount(amount)
                         .currencyRate(transactionPrice)
+                        .amount(amount)
                         .build();
     }
 
