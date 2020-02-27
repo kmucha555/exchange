@@ -1,7 +1,7 @@
 package pl.mkjb.exchange.service;
 
+import io.vavr.Function4;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
@@ -10,6 +10,7 @@ import pl.mkjb.exchange.entity.UserEntity;
 import pl.mkjb.exchange.repository.TransactionRepository;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 import static java.math.RoundingMode.HALF_UP;
 
@@ -20,37 +21,53 @@ public class ExchangeService {
     private final UserService userService;
     private final CurrencyService currencyService;
 
-    public void sellCurrency(CurrencyRateEntity currencyRateEntity, BigDecimal amount, long userId) {
-        val baseCurrencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
-        val currencySellPrice = currencyService.findCurrencyRateByCurrencyRateId(currencyRateEntity.getId()).getSellPrice();
-        val currencyEntity = currencyService.findCurrencyById(currencyRateEntity.getCurrencyEntity().getId());
-        val userEntity = userService.findById(userId);
-        val ownerEntity = userService.findOwner();
+    public void saveTransaction(CurrencyRateEntity currencyRateEntity, BigDecimal transactionCurrencyAmount, long userId) {
+        final CurrencyEntity baseCurrencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
+        final CurrencyEntity currencyEntity = currencyService.findCurrencyById(currencyRateEntity.getCurrencyEntity().getId());
+        final UserEntity exchangeOwner = userService.findOwner();
+        final UserEntity userEntity = userService.findById(userId);
+        BigDecimal transactionBaseCurrencyAmount = transactionCurrencyAmount.multiply(currencyRateEntity.getSellPrice())
+                .divide(BigDecimal.valueOf(currencyEntity.getUnit()), HALF_UP);
 
-        val currencyUnit = BigDecimal.valueOf(currencyEntity.getUnit());
-        val transactionAmountIncreaseBalanceSoldCurrency = amount;
-        val transactionAmountReduceBalanceSoldCurrency = amount.negate();
-        val transactionAmountIncreaseBalanceBaseCurrency = amount.multiply(currencySellPrice).divide(currencyUnit, HALF_UP);
-        val transactionAmountReduceBalanceBaseCurrency = transactionAmountIncreaseBalanceBaseCurrency.negate();
+        final Set<TransactionEntity> transactionEntities = Set.of(
+                prepareTransactionEntity().apply(
+                        currencyEntity,
+                        userEntity,
+                        transactionCurrencyAmount,
+                        currencyRateEntity.getSellPrice()),
 
-        saveTransaction(currencyEntity, ownerEntity, currencySellPrice, transactionAmountReduceBalanceSoldCurrency);
-        saveTransaction(baseCurrencyEntity, ownerEntity, currencySellPrice, transactionAmountIncreaseBalanceBaseCurrency);
-        saveTransaction(currencyEntity, userEntity, currencySellPrice, transactionAmountIncreaseBalanceSoldCurrency);
-        saveTransaction(baseCurrencyEntity, userEntity, currencySellPrice, transactionAmountReduceBalanceBaseCurrency);
+                prepareTransactionEntity().apply(
+                        currencyEntity,
+                        exchangeOwner,
+                        transactionCurrencyAmount.negate(),
+                        currencyRateEntity.getSellPrice()),
+
+                prepareTransactionEntity().apply(
+                        baseCurrencyEntity,
+                        userEntity,
+                        transactionBaseCurrencyAmount.negate(),
+                        currencyRateEntity.getSellPrice()),
+
+                prepareTransactionEntity().apply(
+                        baseCurrencyEntity,
+                        exchangeOwner,
+                        transactionBaseCurrencyAmount,
+                        currencyRateEntity.getSellPrice()));
+
+        save(transactionEntities);
     }
 
-    private void saveTransaction(CurrencyEntity currencyEntity,
-                                 UserEntity userEntity,
-                                 BigDecimal currencyRate,
-                                 BigDecimal transactionAmount) {
+    private Function4<CurrencyEntity, UserEntity, BigDecimal, BigDecimal, TransactionEntity> prepareTransactionEntity() {
+        return (currencyEntity, userEntity, amount, transactionPrice) ->
+                TransactionEntity.builder()
+                        .currencyEntity(currencyEntity)
+                        .userEntity(userEntity)
+                        .amount(amount)
+                        .currencyRate(transactionPrice)
+                        .build();
+    }
 
-        val transactionEntity = TransactionEntity.builder()
-                .currencyEntity(currencyEntity)
-                .currencyRate(currencyRate)
-                .userEntity(userEntity)
-                .amount(transactionAmount)
-                .build();
-
-        transactionRepository.save(transactionEntity);
+    private void save(Set<TransactionEntity> transactionEntities) {
+        transactionRepository.saveAll(transactionEntities);
     }
 }

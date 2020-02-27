@@ -1,7 +1,6 @@
 package pl.mkjb.exchange.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,6 @@ import java.util.UUID;
 
 import static java.math.RoundingMode.DOWN;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TransactionSellService implements Transaction {
@@ -55,8 +53,9 @@ public class TransactionSellService implements Transaction {
     private BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, long userId) {
         val baseCurrencyRateEntity = currencyService.findBaseCurrencyRate();
         val userWalletAmount = walletService.getUserWalletGivenCurrencyAmount(currencyRateEntity.getId(), userId);
-        val exchangeCurrencyAmount = calculateAvailableCurrency(baseCurrencyRateEntity);
-
+        val exchangeCurrencyAmount = calculateAvailableCurrency(baseCurrencyRateEntity)
+                .divide(currencyRateEntity.getPurchasePrice(), 0, DOWN)
+                .multiply(BigDecimal.valueOf(currencyRateEntity.getCurrencyEntity().getUnit()));
         return userWalletAmount.min(exchangeCurrencyAmount);
     }
 
@@ -77,6 +76,6 @@ public class TransactionSellService implements Transaction {
     public void saveTransaction(TransactionModel transactionModel, long userId) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
         val transactionAmount = transactionModel.getTransactionAmount();
-        exchangeService.sellCurrency(currencyRateEntity, transactionAmount, userId);
+        exchangeService.saveTransaction(currencyRateEntity, transactionAmount, userId);
     }
 }

@@ -76,6 +76,6 @@ public class TransactionBuyService implements Transaction {
     public void saveTransaction(TransactionModel transactionModel, long userId) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
         val transactionAmount = transactionModel.getTransactionAmount();
-        exchangeService.sellCurrency(currencyRateEntity, transactionAmount, userId);
+        exchangeService.saveTransaction(currencyRateEntity, transactionAmount, userId);
     }
 }
