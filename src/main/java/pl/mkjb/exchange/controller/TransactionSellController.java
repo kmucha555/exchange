@@ -23,18 +23,18 @@ import java.util.UUID;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/transaction")
-public class TransactionBuyController {
+public class TransactionSellController {
     @Value("${pl.mkjb.exchange.controller.WrongAmount.message}")
     private String wrongAmount;
     private static final String MESSAGE_SUCCESS = Constant.MESSAGE_SUCCESS.name();
     private static final String MESSAGE_FAILED = Constant.MESSAGE_FAILED.name();
-    private static final String VIEW_NAME = "buy";
+    private static final String VIEW_NAME = "sell";
     private static final String MODEL_NAME = "transactionModel";
     private static final String REDIRECT_URL = "redirect:/dashboard";
-    private final Transaction transactionBuyService;
+    private final Transaction transactionSellService;
     private final CurrencyService currencyService;
 
-    @GetMapping("/buy/{currencyRateId}")
+    @GetMapping("/sell/{currencyRateId}")
     public String showBuyForm(@PathVariable UUID currencyRateId,
                               Model model,
                               RedirectAttributes redirectAttributes,
@@ -44,11 +44,11 @@ public class TransactionBuyController {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Given currency rate has been archived");
             return REDIRECT_URL;
         }
-        model.addAttribute(MODEL_NAME, transactionBuyService.getTransactionModel(currencyRateId, authenticatedUser.getId()));
+        model.addAttribute(MODEL_NAME, transactionSellService.getTransactionModel(currencyRateId, authenticatedUser.getId()));
         return VIEW_NAME;
     }
 
-    @PostMapping("/buy")
+    @PostMapping("/sell")
     public String buyCurrency(@Valid TransactionModel transactionModel,
                               BindingResult bindingResult,
                               RedirectAttributes redirectAttributes,
@@ -57,14 +57,14 @@ public class TransactionBuyController {
         if (bindingResult.hasErrors()) {
             return VIEW_NAME;
         }
-        if (transactionBuyService.hasErrors(transactionModel, authenticatedUser.getId())) {
+        if (transactionSellService.hasErrors(transactionModel, authenticatedUser.getId())) {
             bindingResult.rejectValue("transactionAmount", "error.user", wrongAmount);
             return VIEW_NAME;
         }
 
-        transactionBuyService.saveTransaction(transactionModel, authenticatedUser.getId());
+        transactionSellService.saveTransaction(transactionModel, authenticatedUser.getId());
         redirectAttributes.addFlashAttribute(MESSAGE_SUCCESS,
-                String.format("Success! You bought %s %s", transactionModel.getTransactionAmount(), transactionModel.getCurrencyCode()));
+                String.format("Success! You sold %s %s", transactionModel.getTransactionAmount(), transactionModel.getCurrencyCode()));
 
         return REDIRECT_URL;
     }

@@ -13,6 +13,7 @@ import pl.mkjb.exchange.repository.TransactionRepository;
 
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,10 +29,10 @@ public class WalletService {
     }
 
     private Set<WalletModel> addNewestCurrencyRatesToUserWallet(Set<WalletModel> userWallet) {
-        final CurrencyEntity baseCurrencyEntity = currencyService.findBaseCurrency();
+        val baseCurrencyRateEntity = currencyService.findBaseCurrencyRate();
         final CurrencyRatesModel currencyRatesModel = currencyService.getNewestRates();
         return userWallet.stream()
-                .filter(walletModel -> !walletModel.getCode().equals(baseCurrencyEntity.getCode()))
+                .filter(walletModel -> !walletModel.getCode().equals(baseCurrencyRateEntity.getCurrencyEntity().getCode()))
                 .map(walletModel -> {
                     val walletCurrency = getCurrencyModelForWalletCurrency(currencyRatesModel, walletModel);
                     return WalletModel.builder()
@@ -43,8 +44,6 @@ public class WalletService {
                             .build();
                 })
                 .collect(Collectors.toUnmodifiableSet());
-
-
     }
 
     private CurrencyModel getCurrencyModelForWalletCurrency(CurrencyRatesModel currencyRatesModel, WalletModel walletModel) {
@@ -55,11 +54,23 @@ public class WalletService {
                 .orElseThrow(() -> new BadResourceException("There's no currency with given code " + walletModel.getCode()));
     }
 
+    public BigDecimal getUserWalletGivenCurrencyAmount(UUID currencyId, long userId) {
+        val currencyEntity =
+                currencyService.findCurrencyRateByCurrencyRateId(currencyId)
+                        .getCurrencyEntity();
+
+        return getCurrencyAmount(userId, currencyEntity);
+    }
+
     public BigDecimal getUserWalletBaseCurrencyAmount(long userId) {
-        val baseCurrency = currencyService.findBaseCurrency();
+        val baseCurrencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
+        return getCurrencyAmount(userId, baseCurrencyEntity);
+    }
+
+    private BigDecimal getCurrencyAmount(long userId, CurrencyEntity currencyRateEntity) {
         return transactionRepository.findUserWallet(userId)
                 .stream()
-                .filter(walletModel -> walletModel.getCode().equals(baseCurrency.getCode()))
+                .filter(walletModel -> walletModel.getCode().equals(currencyRateEntity.getCode()))
                 .map(WalletModel::getAmount)
                 .findAny()
                 .orElse(BigDecimal.ZERO);

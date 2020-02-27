@@ -10,10 +10,10 @@
         <div class="row row-cols-1 border-secondary border m-2 mb-5">
             <div class="p-5">
                 <div class="w-50 mx-auto">
-                    <h3 class="text-warning text-left mt-10">Buy</h3>
+                    <h3 class="text-danger text-left mt-10">Sell</h3>
                     <!--/*@thymesVar id="transactionModel" type="pl.mkjb.exchange.model.TransactionModel"*/-->
-                    <form class="mt-5" method="post" th:action="@{/transaction/buy}" th:object="${transactionModel}">
-                        <h4 th:text="'Wallet amount: ' + *{userWalletAmount} + ' PLN'"></h4>
+                    <form class="mt-5" method="post" th:action="@{/transaction/sell}" th:object="${transactionModel}">
+                        <h4 th:text="'Wallet amount: ' + *{userWalletAmount} + ' ' + *{currencyCode}"></h4>
                         <div class="text-danger text-left" th:if="${#fields.hasErrors('transactionAmount')}"
                              th:errors="*{transactionAmount}"></div>
                         <div class="form-group mt-3">
@@ -29,7 +29,7 @@
                         <h4 th:text="'Transaction limit [min - max]: ' + *{currencyUnit} + ' - ' +
                          *{maxAllowedTransactionAmount} + ' ' + *{currencyCode}"></h4>
                         <div class="form-group text-center pt-5">
-                            <input class="btn btn-lg btn-block btn-warning" type="submit" value="Buy"/>
+                            <input class="btn btn-lg btn-block btn-danger" type="submit" value="Sell"/>
                         </div>
                         <input th:type="hidden" th:field="*{currencyRateId}" th:value="*{currencyRateId}">
                         <input th:type="hidden" th:field="*{currencyUnit}" th:value="*{currencyUnit}">

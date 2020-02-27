@@ -38,15 +38,14 @@ public class CurrencyService {
                 .orElseThrow(() -> new BadResourceException("Given currency is invalid: " + id));
     }
 
-    public CurrencyModel findCurrencyByCurrencyRate(UUID id) {
-        return currencyRateRepository.findById(id)
-                .map(CurrencyModel::buildCurrencyModel)
-                .orElseThrow(() -> new BadResourceException("Given currency rate id is invalid: " + id));
+    public CurrencyRateEntity findBaseCurrencyRate() {
+        return currencyRateRepository.findByCurrencyEntityBaseCurrencyIsTrue()
+                .getOrElseThrow(() -> new BadResourceException("No base currency found"));
     }
 
-    public CurrencyEntity findBaseCurrency() {
-        return currencyRepository.findByBaseCurrencyIsTrue()
-                .getOrElseThrow(() -> new BadResourceException("No base currency found"));
+    public CurrencyRateEntity findCurrencyRateByCurrencyRateId(UUID id) {
+        return currencyRateRepository.findById(id)
+                .orElseThrow(() -> new BadResourceException("Given currency rate id is invalid: " + id));
     }
 
     public boolean isArchivedCurrencyRate(UUID id) {
