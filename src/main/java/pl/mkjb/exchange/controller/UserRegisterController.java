@@ -42,14 +42,14 @@ public class UserRegisterController {
         if (userService.isGivenUserNameAlreadyUsed(userModel)) {
             bindingResult.rejectValue(
                     "userName", "error.user",
-                    "Username already used"
+                    userExistsMessage
             );
         }
         if (bindingResult.hasErrors()) {
             return VIEW_NAME;
         }
         userService.save(userModel);
-        redirectAttributes.addFlashAttribute(MESSAGE, userExistsMessage);
+        redirectAttributes.addFlashAttribute(MESSAGE, "Successfully registered");
         return REDIRECT_URL;
     }
 }
