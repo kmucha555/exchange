@@ -23,7 +23,7 @@ import java.util.UUID;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/transaction")
-public class TransactionController {
+public class TransactionBuyController {
     @Value("${pl.mkjb.exchange.controller.WrongAmount.message}")
     private String wrongAmount;
 
@@ -49,7 +49,7 @@ public class TransactionController {
             bindingResult.rejectValue("buyAmount", "error.user", wrongAmount);
             return VIEW_NAME;
         }
-
+        transactionService.saveTransaction(transactionModel, authenticatedUser.getId());
         return "redirect:/dashboard";
     }
 }

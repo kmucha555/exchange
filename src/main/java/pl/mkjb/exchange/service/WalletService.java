@@ -1,39 +1,63 @@
 package pl.mkjb.exchange.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
+import pl.mkjb.exchange.exception.BadResourceException;
+import pl.mkjb.exchange.model.CurrencyModel;
 import pl.mkjb.exchange.model.CurrencyRatesModel;
 import pl.mkjb.exchange.model.WalletModel;
 import pl.mkjb.exchange.repository.TransactionRepository;
 
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WalletService {
     private final CurrencyService currencyService;
     private final TransactionRepository transactionRepository;
 
-    public Set<WalletModel> getUserWallet(Long userId) {
-        final CurrencyRatesModel newestRates = currencyService.getNewestRates();
-        final Set<WalletModel> userWallet = transactionRepository.findUserWallet(userId);
+    public Set<WalletModel> getUserWallet(long userId) {
+        val userWallet = transactionRepository.findUserWallet(userId);
+        return addNewestCurrencyRatesToUserWallet(userWallet);
+    }
 
-        userWallet.forEach(walletModel -> newestRates.getItems()
+    private Set<WalletModel> addNewestCurrencyRatesToUserWallet(Set<WalletModel> userWallet) {
+        final CurrencyEntity baseCurrencyEntity = currencyService.findBaseCurrency();
+        final CurrencyRatesModel currencyRatesModel = currencyService.getNewestRates();
+        return userWallet.stream()
+                .filter(walletModel -> !walletModel.getCode().equals(baseCurrencyEntity.getCode()))
+                .map(walletModel -> {
+                    val walletCurrency = getCurrencyModelForWalletCurrency(currencyRatesModel, walletModel);
+                    return WalletModel.builder()
+                            .amount(walletModel.getAmount())
+                            .code(walletModel.getCode())
+                            .unit(walletCurrency.getUnit())
+                            .currencyRateId(walletCurrency.getCurrencyRateId())
+                            .purchasePrice(walletCurrency.getPurchasePrice())
+                            .build();
+                })
+                .collect(Collectors.toUnmodifiableSet());
+
+
+    }
+
+    private CurrencyModel getCurrencyModelForWalletCurrency(CurrencyRatesModel currencyRatesModel, WalletModel walletModel) {
+        return currencyRatesModel.getItems()
                 .stream()
                 .filter(currencyModel -> currencyModel.getCode().equals(walletModel.getCode()))
-                .forEach(currencyModel -> {
-                    walletModel.setCurrencyRateId(currencyModel.getCurrencyRateId());
-                    walletModel.setPurchasePrice(currencyModel.getPurchasePrice());
-                }));
-
-        return userWallet;
+                .findFirst()
+                .orElseThrow(() -> new BadResourceException("There's no currency with given code " + walletModel.getCode()));
     }
 
     public BigDecimal getUserWalletBaseCurrencyAmount(long userId) {
-        final CurrencyEntity baseCurrency = currencyService.findBaseCurrency();
-        return getUserWallet(userId)
+        val baseCurrency = currencyService.findBaseCurrency();
+        return transactionRepository.findUserWallet(userId)
                 .stream()
                 .filter(walletModel -> walletModel.getCode().equals(baseCurrency.getCode()))
                 .map(WalletModel::getAmount)

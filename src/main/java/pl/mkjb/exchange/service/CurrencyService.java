@@ -32,7 +32,12 @@ public class CurrencyService {
                 .getOrElseThrow(() -> new BadResourceException(CurrencyService.class, "No currency rates available."));
     }
 
-    public CurrencyModel findCurrency(UUID id) {
+    public CurrencyEntity findCurrencyById(int id) {
+        return currencyRepository.findById(id)
+                .orElseThrow(() -> new BadResourceException("Given currency is invalid: " + id));
+    }
+
+    public CurrencyModel findCurrencyByCurrencyRate(UUID id) {
         return currencyRateRepository.findById(id)
                 .map(CurrencyModel::buildCurrencyModel)
                 .orElseThrow(() -> new BadResourceException("Given currency rate id is invalid: " + id));
@@ -43,7 +48,7 @@ public class CurrencyService {
                 .getOrElseThrow(() -> new BadResourceException("No base currency found"));
     }
 
-    public boolean isValidCurrencyRateId(UUID currencyId) {
+    public boolean isValidCurrencyRate(UUID currencyId) {
         return Option.ofOptional(currencyRateRepository.findById(currencyId))
                 .isDefined();
     }

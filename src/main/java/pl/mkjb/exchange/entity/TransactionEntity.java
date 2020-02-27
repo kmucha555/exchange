@@ -1,6 +1,8 @@
 package pl.mkjb.exchange.entity;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +10,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
@@ -38,5 +42,4 @@ public class TransactionEntity {
     void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
-
 }

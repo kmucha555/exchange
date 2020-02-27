@@ -22,6 +22,7 @@ public class CurrencyModel {
     private BigDecimal purchasePrice;
     private BigDecimal sellPrice;
     private BigDecimal averagePrice;
+    private boolean baseCurrency;
 
     public static CurrencyModel buildCurrencyModel(CurrencyRateEntity currencyRate) {
         return CurrencyModel.builder()
@@ -33,6 +34,7 @@ public class CurrencyModel {
                 .purchasePrice(currencyRate.getPurchasePrice())
                 .sellPrice(currencyRate.getSellPrice())
                 .averagePrice(currencyRate.getAveragePrice())
+                .baseCurrency(currencyRate.getCurrencyEntity().getBaseCurrency())
                 .build();
     }
 }

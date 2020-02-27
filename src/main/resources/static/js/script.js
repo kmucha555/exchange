@@ -69,9 +69,9 @@ $(document).ready(function () {
                         returnData.push(
                             {
                                 'code': element.code,
-                                'amount': element.amount.toFixed(2),
+                                'amount': element.amount.toFixed(0),
                                 'purchasePrice': element.purchasePrice.toFixed(4),
-                                'value': (element.amount * element.purchasePrice).toFixed(2),
+                                'value': (element.amount * element.purchasePrice / element.unit).toFixed(2),
                                 'action': `<a class="btn-sm btn-danger" href="/transaction/sell/${element.currencyRateId}">Sell</a>`
                             }
                         )

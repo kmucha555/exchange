@@ -15,6 +15,7 @@ import pl.mkjb.exchange.util.Role;
 
 import java.util.Set;
 
+import static pl.mkjb.exchange.util.Role.ROLE_OWNER;
 import static pl.mkjb.exchange.util.Role.ROLE_USER;
 
 @Service
@@ -39,12 +40,25 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
-    public RoleEntity findRoleByName(Role role) {
+    public UserEntity findById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new BadResourceException("Given user id doesn't exist" + id));
+    }
+
+    public UserEntity findOwner() {
+        val roleEntity = findRoleByName(ROLE_OWNER);
+        return findUsersByRole(roleEntity)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new BadResourceException("User with ROLE_OWNER doesn't exists"));
+    }
+
+    private RoleEntity findRoleByName(Role role) {
         return roleRepository.findByRole(role.name())
                 .getOrElseThrow(() -> new BadResourceException("Given role name doesn't exist" + role));
     }
 
-    public Set<UserEntity> findUsersByRole(RoleEntity roleEntity) {
+    private Set<UserEntity> findUsersByRole(RoleEntity roleEntity) {
         return userRepository.findByRolesContaining(roleEntity);
     }
 }
