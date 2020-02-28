@@ -15,6 +15,7 @@ import pl.mkjb.exchange.model.TransactionModel;
 import pl.mkjb.exchange.security.CustomAuthenticatedUser;
 import pl.mkjb.exchange.service.CurrencyService;
 import pl.mkjb.exchange.service.Transaction;
+import pl.mkjb.exchange.service.WalletService;
 import pl.mkjb.exchange.util.Message;
 
 import javax.validation.Valid;
@@ -33,6 +34,7 @@ public class TransactionSellController {
     private static final String REDIRECT_URL = "redirect:/dashboard";
     private final Transaction transactionSellService;
     private final CurrencyService currencyService;
+    private final WalletService walletService;
 
     @GetMapping("/sell/{currencyRateId}")
     public String showBuyForm(@PathVariable UUID currencyRateId,
@@ -42,6 +44,10 @@ public class TransactionSellController {
 
         if (currencyService.isArchivedCurrencyRate(currencyRateId)) {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Given currency rate has been archived");
+            return REDIRECT_URL;
+        }
+        if (walletService.hasInsufficientFundsForSellCurrency(currencyRateId, authenticatedUser.getId())) {
+            redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Insufficient funds");
             return REDIRECT_URL;
         }
         model.addAttribute(MODEL_NAME, transactionSellService.getTransactionModel(currencyRateId, authenticatedUser.getId()));

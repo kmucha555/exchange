@@ -46,7 +46,7 @@ public class TransactionBuyController {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Given currency rate has been archived");
             return REDIRECT_URL;
         }
-        if (walletService.hasInsufficientFunds(currencyRateId, authenticatedUser.getId())) {
+        if (walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, authenticatedUser.getId())) {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Insufficient funds");
             return REDIRECT_URL;
         }

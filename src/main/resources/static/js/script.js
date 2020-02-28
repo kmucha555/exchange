@@ -26,17 +26,22 @@ $(document).ready(function () {
                 dataSrc: json => {
                     const returnData = [];
                     publicationDate = new Date(json.publicationDate);
-                    $("#lastUpdate").html(`Last update: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}`);
-                    json.items.forEach(element =>
+                    $('#lastUpdate').html(`Last update: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}`);
+                    json.items.forEach(element => {
+                        const sellPrice = parseFloat(element.sellPrice.toFixed(4));
+                        const unit = parseInt(element.unit);
+                        const availableFunds = parseFloat($('#funds').text());
                         returnData.push(
                             {
                                 'code': element.code,
-                                'unit': element.unit,
-                                'sellPrice': element.sellPrice.toFixed(4),
-                                'action': `<a class="btn-sm btn-warning" href="/transaction/buy/${element.currencyRateId}">Buy</a>`
+                                'unit': unit,
+                                'sellPrice': sellPrice,
+                                'action': availableFunds > sellPrice * unit ?
+                                    `<a class="btn-sm btn-warning" href="/transaction/buy/${element.currencyRateId}">Buy</a>`
+                                    : ``
                             }
                         )
-                    );
+                    });
                     return returnData;
                 }
             },
@@ -65,17 +70,20 @@ $(document).ready(function () {
                 url: window.location.href + '/wallet',
                 dataSrc: json => {
                     const returnData = [];
-                    json.forEach(element =>
+                    json.forEach(element => {
+                        const amount = parseInt(element.amount.toFixed(0));
+                        const purchasePrice = parseFloat(element.purchasePrice.toFixed(4));
+                        const unit = parseInt(element.unit);
                         returnData.push(
                             {
                                 'code': element.code,
-                                'amount': element.amount.toFixed(0),
-                                'purchasePrice': element.purchasePrice.toFixed(4),
-                                'value': (element.amount * element.purchasePrice / element.unit).toFixed(2),
-                                'action': `<a class="btn-sm btn-danger" href="/transaction/sell/${element.currencyRateId}">Sell</a>`
+                                'amount': amount,
+                                'purchasePrice': purchasePrice,
+                                'value': (amount * purchasePrice / unit).toFixed(2),
+                                'action': amount === 0 ? `` : `<a class="btn-sm btn-danger" href="/transaction/sell/${element.currencyRateId}">Sell</a>`
                             }
                         )
-                    );
+                    });
                     return returnData;
                 }
             },

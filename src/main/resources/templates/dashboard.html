@@ -55,7 +55,7 @@
             </div>
             <div class="col-6">
                 <div class="border-success border p-3">
-                    <h5 class="text-left" th:text="'Available funds: ' + ${baseCurrencyAmount} + ' PLN'"></h5>
+                    <h5 class="text-left">Available funds: <span id="funds" th:text="'' + ${baseCurrencyAmount}"></span> PLN</h5>
                 </div>
             </div>
         </div>

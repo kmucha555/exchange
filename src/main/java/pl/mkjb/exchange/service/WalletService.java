@@ -76,9 +76,13 @@ public class WalletService {
                 .orElse(BigDecimal.ZERO);
     }
 
-    public boolean hasInsufficientFunds(UUID currencyId, long userId) {
+    public boolean hasInsufficientFundsForBuyCurrency(UUID currencyId, long userId) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyId);
         val minimalTransactionAmount = currencyRateEntity.getSellPrice().multiply(BigDecimal.valueOf(currencyRateEntity.getCurrencyEntity().getUnit()));
         return getUserWalletAmountForBaseCurrency(userId).compareTo(minimalTransactionAmount) < 1;
+    }
+
+    public boolean hasInsufficientFundsForSellCurrency(UUID currencyId, long userId) {
+        return getUserWalletAmountForGivenCurrency(currencyId, userId).compareTo(BigDecimal.ZERO) < 1;
     }
 }
