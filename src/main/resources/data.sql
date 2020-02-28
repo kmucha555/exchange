@@ -17,4 +17,3 @@ INSERT INTO transactions (id, amount, created_at, currency_rate, currency_id, us
 INSERT INTO transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (5, 500000.00, '2020-02-25 16:03:40', 14.3227, 5, 1);
 INSERT INTO transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (6, 5000.00, '2020-02-25 16:03:40', 5.7251, 6, 1);
 INSERT INTO transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (7, 50000.00, '2020-02-25 16:03:40', 5.7251, 7, 1);
-INSERT INTO transactions (id, amount, created_at, currency_rate, currency_id, user_id) VALUES (8, 10000.00, '2020-02-25 16:03:40', 1, 7, 2);
