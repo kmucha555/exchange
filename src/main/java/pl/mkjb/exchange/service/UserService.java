@@ -46,6 +46,7 @@ public class UserService {
         userEntity.setRoles(Set.of(roleEntity));
         val savedUserEntity = userRepository.save(userEntity);
         saveInitialTransactions(savedUserEntity);
+        addFundsForDemonstration(savedUserEntity);
     }
 
     public UserEntity findById(long id) {
@@ -71,18 +72,30 @@ public class UserService {
     }
 
     private void saveInitialTransactions(UserEntity userEntity) {
-        final Set<TransactionEntity> transactionEntities = currencyService.findAll()
+        val transactionEntities = currencyService.findAll()
                 .stream()
                 .map(currencyEntity ->
                         TransactionEntity.builder()
                                 .userEntity(userEntity)
                                 .currencyEntity(currencyEntity)
                                 .amount(BigDecimal.ZERO)
-                                .currencyRate(BigDecimal.ZERO)
+                                .currencyRate(BigDecimal.ONE)
                                 .createdAt(LocalDateTime.now())
                                 .build())
                 .collect(Collectors.toUnmodifiableSet());
         transactionRepository.saveAll(transactionEntities);
     }
 
+    private void addFundsForDemonstration(UserEntity userEntity) {
+        val currencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
+        val transactionEntity = TransactionEntity.builder()
+                .userEntity(userEntity)
+                .currencyEntity(currencyEntity)
+                .amount(BigDecimal.valueOf(10000))
+                .currencyRate(BigDecimal.ONE)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        transactionRepository.save(transactionEntity);
+    }
 }
