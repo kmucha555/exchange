@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  exchange:
+    build:
+      context: .
+    container_name: fp-exchange
+    ports:
+      - 8080:8080
+    restart: on-failure
+    environment:
+      - ENV=jdbc:mysql://07551504_exchange:bc4DQrgC5tBaT7Bb@mkjb.home.pl:3306/07551504_exchange?serverTimezone=UTC

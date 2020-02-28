@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: headFragment}">
+</head>
+<body>
+<div class="container-fluid mt-5">
+    <header th:replace="~{fragments/header :: headerFragment}">
+    </header>
+    <section>
+        <div class="row m-2">
+            <div class="col-12">
+                <small id="lastUpdate"></small>
+            </div>
+            <div class="col-6">
+                <div class="border-success border p-3">
+                    <h5 class="text-left">Currencies</h5>
+                    <div class="table-responsive">
+                        <table id="currencies" class="display">
+                            <thead>
+                            <tr>
+                                <th>Currency</th>
+                                <th>Unit</th>
+                                <th>Value</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="border-success border p-3">
+                    <h5 class="text-left">My Wallet</h5>
+                    <div class="table-responsive">
+                        <table id="wallet" class="display">
+                            <thead>
+                            <tr>
+                                <th>Currency</th>
+                                <th>Unit Price</th>
+                                <th>Amount</th>
+                                <th>Value</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row m-2">
+            <div class="col-6">
+                <div class="border-success border p-3">
+                    <h5 class="text-left">Chart</h5>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="border-success border p-3">
+                    <h5 class="text-left">Available funds: <span id="funds" th:text="'' + ${baseCurrencyAmount}"></span> PLN</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<footer th:replace="~{fragments/footer :: footerFragment}">
+</footer>
+</body>
+</html>

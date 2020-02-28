@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<header th:fragment="headerFragment" class="row row-cols-1 m-2 mb-2">
+    <!--/*@thymesVar id="MESSAGE_SUCCESS" type="pl.mkjb.exchange.util.Message"*/-->
+    <!--/*@thymesVar id="MESSAGE_FAILED" type="pl.mkjb.exchange.util.Message"*/-->
+    <div class="alert alert-success" role="alert" th:if="${MESSAGE_SUCCESS}" th:text="${MESSAGE_SUCCESS}"></div>
+    <div class="alert alert-warning" role="alert" th:if="${MESSAGE_FAILED}" th:text="${MESSAGE_FAILED}"></div>
+    <div class="form-group d-flex justify-content-between">
+        <h1 sec:authorize="!isAuthenticated()"><a th:href="@{/}" class="m-2 text-success text-">EXCHANGE</a></h1>
+        <h1 sec:authorize="isAuthenticated()"><a th:href="@{/dashboard}" class="m-2 text-success text-">EXCHANGE</a>
+        </h1>
+        <div sec:authorize="!isAuthenticated()">
+            <a th:href="@{/login}" class="btn btn-warning m-2" type="button">Sign In</a>
+            <a th:href="@{/register}" class="btn btn-success m-2" type="button">Sign Up</a>
+        </div>
+        <div sec:authorize="isAuthenticated()">
+            <form class="form-inline" method="post" th:action="@{/logout}">
+                <span class="small mr-3 font-weight-bold"
+                      th:text="${'Logged in as ' + #authentication.getPrincipal().getFullName()}"></span>
+                <span class="fas fa-cog fa-2x text-warning mr-3"></span>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-outline-success" value="Logout">
+                </div>
+            </form>
+        </div>
+    </div>
+</header>
