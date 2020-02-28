@@ -50,9 +50,9 @@ public class TransactionSellService implements Transaction {
     }
 
     private BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, long userId) {
-        val baseCurrencyRateEntity = currencyService.findBaseCurrencyRate();
+        val billingCurrencyRateEntity = currencyService.findBillingCurrencyRate();
         val userWalletAmount = walletService.getUserWalletAmountForGivenCurrency(currencyRateEntity.getId(), userId);
-        val exchangeCurrencyAmount = calculateAvailableCurrency(baseCurrencyRateEntity)
+        val exchangeCurrencyAmount = calculateAvailableCurrency(billingCurrencyRateEntity)
                 .divide(currencyRateEntity.getPurchasePrice(), 0, DOWN)
                 .multiply(currencyRateEntity.getCurrencyEntity().getUnit());
         return userWalletAmount.min(exchangeCurrencyAmount);

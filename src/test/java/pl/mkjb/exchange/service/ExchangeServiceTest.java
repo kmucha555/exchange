@@ -33,12 +33,12 @@ class ExchangeServiceTest {
         int currencyId = 1;
         long userId = 1;
         long ownerId = 2;
-        UUID baseCurrencyRateId = UUID.randomUUID();
+        UUID billingCurrencyRateId = UUID.randomUUID();
         UUID currencyRateId = UUID.randomUUID();
         var publicationDate = LocalDateTime.of(2020, 2, 26, 17, 20, 5);
         var createdAt = LocalDateTime.of(2020, 2, 26, 17, 20, 20);
         CurrencyEntity currencyEntity = new CurrencyEntity(1, "US Dollar", "USD", BigDecimal.ONE, false);
-        CurrencyEntity baseCurrencyEntity = new CurrencyEntity(2, "Polish zloty", "PLN", BigDecimal.ONE, true);
+        CurrencyEntity billingCurrencyEntity = new CurrencyEntity(2, "Polish zloty", "PLN", BigDecimal.ONE, true);
         var currencySellPrice = BigDecimal.valueOf(3.7392);
         var currencyPurchasePrice = BigDecimal.valueOf(3.7222);
         var currencyAveragePrice = BigDecimal.valueOf(3.7300);
@@ -54,9 +54,9 @@ class ExchangeServiceTest {
                 Boolean.FALSE,
                 createdAt);
 
-        var baseCurrencyRateEntity = new CurrencyRateEntity(
-                baseCurrencyRateId,
-                baseCurrencyEntity,
+        var billingCurrencyRateEntity = new CurrencyRateEntity(
+                billingCurrencyRateId,
+                billingCurrencyEntity,
                 BigDecimal.ONE,
                 BigDecimal.ONE,
                 BigDecimal.ONE,
@@ -85,7 +85,7 @@ class ExchangeServiceTest {
                 createdAt);
 
         when(currencyServiceMock.findCurrencyById(currencyId)).thenReturn(currencyEntity);
-        when(currencyServiceMock.findBaseCurrencyRate()).thenReturn(baseCurrencyRateEntity);
+        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
         when(userServiceMock.findOwner()).thenReturn(exchangeOwnerEntity);
         when(userServiceMock.findById(userId)).thenReturn(userEntity);
 
@@ -97,7 +97,7 @@ class ExchangeServiceTest {
                 .userId(userId)
                 .build();
 
-        var transactionBaseCurrencyAmount = transactionBuilder.getTransactionAmount().multiply(transactionBuilder.getTransactionPrice())
+        var transactionBillingCurrencyAmount = transactionBuilder.getTransactionAmount().multiply(transactionBuilder.getTransactionPrice())
                 .divide(currencyEntity.getUnit(), HALF_UP);
 
         var transactionOne = TransactionEntity.builder()
@@ -113,16 +113,16 @@ class ExchangeServiceTest {
                 .amount(transactionBuilder.getTransactionAmount())
                 .build();
         var transactionThree = TransactionEntity.builder()
-                .currencyEntity(baseCurrencyEntity)
+                .currencyEntity(billingCurrencyEntity)
                 .userEntity(userEntity)
                 .currencyRate(transactionBuilder.getTransactionPrice())
-                .amount(transactionBaseCurrencyAmount)
+                .amount(transactionBillingCurrencyAmount)
                 .build();
         var transactionFour = TransactionEntity.builder()
-                .currencyEntity(baseCurrencyEntity)
+                .currencyEntity(billingCurrencyEntity)
                 .userEntity(exchangeOwnerEntity)
                 .currencyRate(transactionBuilder.getTransactionPrice())
-                .amount(transactionBaseCurrencyAmount.negate())
+                .amount(transactionBillingCurrencyAmount.negate())
                 .build();
 
         //when

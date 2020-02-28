@@ -87,7 +87,7 @@ public class UserService {
     }
 
     private void addFundsForUserForDemonstration(UserEntity userEntity) {
-        val currencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
+        val currencyEntity = currencyService.findBillingCurrencyRate().getCurrencyEntity();
         val transactionEntity = TransactionEntity.builder()
                 .userEntity(userEntity)
                 .currencyEntity(currencyEntity)

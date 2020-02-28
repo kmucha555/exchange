@@ -28,11 +28,11 @@ public class CurrencyEntity {
     @Column(nullable = false, precision = 4, scale = 0)
     private BigDecimal unit;
 
-    @Column(name = "base_currency", nullable = false)
-    private Boolean baseCurrency;
+    @Column(name = "billing_currency", nullable = false)
+    private Boolean billingCurrency;
 
     @PrePersist
     public void prePersist() {
-        this.baseCurrency = Boolean.FALSE;
+        this.billingCurrency = Boolean.FALSE;
     }
 }

@@ -56,8 +56,8 @@ public class DashboardController {
     }
 
     @ModelAttribute("baseCurrencyAmount")
-    public BigDecimal getUserWalletBaseCurrencyAmount(@AuthenticationPrincipal CustomAuthenticatedUser customAuthenticatedUser) {
-        return walletService.getUserWalletAmountForBaseCurrency(customAuthenticatedUser.getId());
+    public BigDecimal getUserWalletBillingCurrencyAmount(@AuthenticationPrincipal CustomAuthenticatedUser customAuthenticatedUser) {
+        return walletService.getUserWalletAmountForBillingCurrency(customAuthenticatedUser.getId());
     }
 }
 

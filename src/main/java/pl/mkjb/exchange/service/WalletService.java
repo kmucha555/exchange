@@ -29,7 +29,7 @@ public class WalletService {
     }
 
     private Set<WalletModel> addNewestCurrencyRatesToUserWallet(Set<WalletModel> userWallet) {
-        val baseCurrencyRateEntity = currencyService.findBaseCurrencyRate();
+        val baseCurrencyRateEntity = currencyService.findBillingCurrencyRate();
         final CurrencyRatesModel currencyRatesModel = currencyService.getNewestRates();
         return userWallet.stream()
                 .filter(walletModel -> !walletModel.getCode().equals(baseCurrencyRateEntity.getCurrencyEntity().getCode()))
@@ -62,9 +62,9 @@ public class WalletService {
         return getCurrencyAmount(userId, currencyEntity);
     }
 
-    public BigDecimal getUserWalletAmountForBaseCurrency(long userId) {
-        val baseCurrencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
-        return getCurrencyAmount(userId, baseCurrencyEntity);
+    public BigDecimal getUserWalletAmountForBillingCurrency(long userId) {
+        val billingCurrencyEntity = currencyService.findBillingCurrencyRate().getCurrencyEntity();
+        return getCurrencyAmount(userId, billingCurrencyEntity);
     }
 
     private BigDecimal getCurrencyAmount(long userId, CurrencyEntity currencyRateEntity) {
@@ -79,7 +79,7 @@ public class WalletService {
     public boolean hasInsufficientFundsForBuyCurrency(UUID currencyId, long userId) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyId);
         val minimalTransactionAmount = currencyRateEntity.getSellPrice().multiply(currencyRateEntity.getCurrencyEntity().getUnit());
-        return getUserWalletAmountForBaseCurrency(userId).compareTo(minimalTransactionAmount) < 1;
+        return getUserWalletAmountForBillingCurrency(userId).compareTo(minimalTransactionAmount) < 1;
     }
 
     public boolean hasInsufficientFundsForSellCurrency(UUID currencyId, long userId) {
