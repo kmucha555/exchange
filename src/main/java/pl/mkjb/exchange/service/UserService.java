@@ -46,7 +46,7 @@ public class UserService {
         userEntity.setRoles(Set.of(roleEntity));
         val savedUserEntity = userRepository.save(userEntity);
         saveInitialTransactions(savedUserEntity);
-        addFundsForDemonstration(savedUserEntity);
+        addFundsForUserForDemonstration(savedUserEntity);
     }
 
     public UserEntity findById(long id) {
@@ -86,7 +86,7 @@ public class UserService {
         transactionRepository.saveAll(transactionEntities);
     }
 
-    private void addFundsForDemonstration(UserEntity userEntity) {
+    private void addFundsForUserForDemonstration(UserEntity userEntity) {
         val currencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
         val transactionEntity = TransactionEntity.builder()
                 .userEntity(userEntity)

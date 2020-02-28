@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Builder
 @Getter
-public class TModel {
+public class TransactionBuilder {
     private final CurrencyRateEntity currencyRateEntity;
     private final BigDecimal transactionAmount;
     private final BigDecimal transactionPrice;

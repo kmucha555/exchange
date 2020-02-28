@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
 import pl.mkjb.exchange.entity.UserEntity;
-import pl.mkjb.exchange.model.TModel;
+import pl.mkjb.exchange.model.TransactionBuilder;
 import pl.mkjb.exchange.model.TransactionModel;
 import pl.mkjb.exchange.repository.TransactionRepository;
 
@@ -77,13 +77,13 @@ public class TransactionSellService implements Transaction {
     @Transactional
     public void saveTransaction(TransactionModel transactionModel, long userId) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
-        final TModel tModel = TModel.builder()
+        final TransactionBuilder transactionBuilder = TransactionBuilder.builder()
                 .currencyRateEntity(currencyRateEntity)
                 .transactionAmount(transactionModel.getTransactionAmount())
                 .transactionPrice(currencyRateEntity.getPurchasePrice())
                 .userId(userId)
                 .transactionType(SELL)
                 .build();
-        exchangeService.saveTransaction(tModel);
+        exchangeService.saveTransaction(transactionBuilder);
     }
 }
