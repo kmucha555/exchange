@@ -1,9 +1,8 @@
 $(document).ready(function () {
     let publicationDate;
 
-    $.fn.dataTable.ext.errMode = (settings, techNote, message) => {
-        // clearInterval(updateInterval);
-        $("#lastUpdate").html(`<h3 class="text-danger">System temporary unavailable</h3><h6 class="text-danger">${message}</h6>`);
+    $.fn.dataTable.ext.errMode = () => {
+        $("#lastUpdate").html(`<h3 class="text-danger">System temporary unavailable</h3>`);
         $("#wallet").find('a').hide();
         $("#currencies").find('a').hide();
     };
@@ -96,7 +95,7 @@ $(document).ready(function () {
             ]
         });
 
-    const updateInterval = setInterval(() => {
+    setInterval(() => {
         currencies.ajax.reload();
         wallet.ajax.reload();
     }, 5000);
