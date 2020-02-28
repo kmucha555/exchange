@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequiredArgsConstructor
 public class FutureProcessingRestClient implements RestClient {
     private final AtomicBoolean activeConnection = new AtomicBoolean(false);
-    private static final Duration TIMEOUT = Duration.ofSeconds(1L);
+    private static final Duration TIMEOUT = Duration.ofSeconds(3L);
     private final RestTemplateBuilder restTemplateBuilder;
 
     @Value("${pl.mkjb.exchange.restclient.api.url}")
