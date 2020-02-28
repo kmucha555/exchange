@@ -54,7 +54,7 @@ public class WalletService {
                 .orElseThrow(() -> new BadResourceException("There's no currency with given code " + walletModel.getCode()));
     }
 
-    public BigDecimal getUserWalletGivenCurrencyAmount(UUID currencyId, long userId) {
+    public BigDecimal getUserWalletAmountForGivenCurrency(UUID currencyId, long userId) {
         val currencyEntity =
                 currencyService.findCurrencyRateByCurrencyRateId(currencyId)
                         .getCurrencyEntity();
@@ -62,7 +62,7 @@ public class WalletService {
         return getCurrencyAmount(userId, currencyEntity);
     }
 
-    public BigDecimal getUserWalletBaseCurrencyAmount(long userId) {
+    public BigDecimal getUserWalletAmountForBaseCurrency(long userId) {
         val baseCurrencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
         return getCurrencyAmount(userId, baseCurrencyEntity);
     }
@@ -74,5 +74,11 @@ public class WalletService {
                 .map(WalletModel::getAmount)
                 .findAny()
                 .orElse(BigDecimal.ZERO);
+    }
+
+    public boolean hasInsufficientFunds(UUID currencyId, long userId) {
+        val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyId);
+        val minimalTransactionAmount = currencyRateEntity.getSellPrice().multiply(BigDecimal.valueOf(currencyRateEntity.getCurrencyEntity().getUnit()));
+        return getUserWalletAmountForBaseCurrency(userId).compareTo(minimalTransactionAmount) < 1;
     }
 }

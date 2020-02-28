@@ -47,14 +47,14 @@ public class TransactionSellService implements Transaction {
                 .currencyCode(currencyRateEntity.getCurrencyEntity().getCode())
                 .currencyUnit(currencyRateEntity.getCurrencyEntity().getUnit())
                 .transactionPrice(currencyRateEntity.getPurchasePrice())
-                .userWalletAmount(walletService.getUserWalletGivenCurrencyAmount(currencyRateId, userId).setScale(0, DOWN))
+                .userWalletAmount(walletService.getUserWalletAmountForGivenCurrency(currencyRateId, userId).setScale(0, DOWN))
                 .maxAllowedTransactionAmount(estimateMaxTransactionAmount(currencyRateEntity, userId).setScale(0, DOWN))
                 .build();
     }
 
     private BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, long userId) {
         val baseCurrencyRateEntity = currencyService.findBaseCurrencyRate();
-        val userWalletAmount = walletService.getUserWalletGivenCurrencyAmount(currencyRateEntity.getId(), userId);
+        val userWalletAmount = walletService.getUserWalletAmountForGivenCurrency(currencyRateEntity.getId(), userId);
         val exchangeCurrencyAmount = calculateAvailableCurrency(baseCurrencyRateEntity)
                 .divide(currencyRateEntity.getPurchasePrice(), 0, DOWN)
                 .multiply(BigDecimal.valueOf(currencyRateEntity.getCurrencyEntity().getUnit()));

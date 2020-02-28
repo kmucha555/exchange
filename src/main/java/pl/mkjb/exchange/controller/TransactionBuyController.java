@@ -15,6 +15,7 @@ import pl.mkjb.exchange.model.TransactionModel;
 import pl.mkjb.exchange.security.CustomAuthenticatedUser;
 import pl.mkjb.exchange.service.CurrencyService;
 import pl.mkjb.exchange.service.Transaction;
+import pl.mkjb.exchange.service.WalletService;
 import pl.mkjb.exchange.util.Message;
 
 import javax.validation.Valid;
@@ -32,6 +33,7 @@ public class TransactionBuyController {
     private static final String MODEL_NAME = "transactionModel";
     private static final String REDIRECT_URL = "redirect:/dashboard";
     private final Transaction transactionBuyService;
+    private final WalletService walletService;
     private final CurrencyService currencyService;
 
     @GetMapping("/buy/{currencyRateId}")
@@ -42,6 +44,10 @@ public class TransactionBuyController {
 
         if (currencyService.isArchivedCurrencyRate(currencyRateId)) {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Given currency rate has been archived");
+            return REDIRECT_URL;
+        }
+        if (walletService.hasInsufficientFunds(currencyRateId, authenticatedUser.getId())) {
+            redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Insufficient funds");
             return REDIRECT_URL;
         }
         model.addAttribute(MODEL_NAME, transactionBuyService.getTransactionModel(currencyRateId, authenticatedUser.getId()));
