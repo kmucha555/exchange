@@ -29,9 +29,6 @@ public class TransactionBuyService implements Transaction {
 
     @Override
     public boolean hasErrors(TransactionModel transactionModel, long userId) {
-        if (currencyService.isArchivedCurrencyRate(transactionModel.getCurrencyRateId())) {
-            return true;
-        }
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
         val buyAmount = transactionModel.getTransactionAmount();
 
@@ -78,13 +75,14 @@ public class TransactionBuyService implements Transaction {
     @Transactional
     public void saveTransaction(TransactionModel transactionModel, long userId) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
-        final TransactionBuilder transactionBuilder = TransactionBuilder.builder()
+        val transactionBuilder = TransactionBuilder.builder()
                 .currencyRateEntity(currencyRateEntity)
                 .transactionAmount(transactionModel.getTransactionAmount())
                 .transactionPrice(currencyRateEntity.getSellPrice())
                 .userId(userId)
                 .transactionType(BUY)
                 .build();
-        exchangeService.saveTransaction(transactionBuilder);
+        val transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);
+        exchangeService.saveTransaction(transactionEntities);
     }
 }

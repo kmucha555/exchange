@@ -13,7 +13,6 @@ import pl.mkjb.exchange.exception.BadResourceException;
 import pl.mkjb.exchange.exception.RestTemplateResponseErrorHandler;
 import pl.mkjb.exchange.model.CurrencyRatesModel;
 
-import java.time.Duration;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
@@ -21,7 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequiredArgsConstructor
 public class FutureProcessingRestClient implements RestClient {
     private final AtomicBoolean activeConnection = new AtomicBoolean(false);
-    private static final Duration TIMEOUT = Duration.ofSeconds(3L);
     private final RestTemplate restTemplate;
 
     @Value("${pl.mkjb.exchange.restclient.api.url}")

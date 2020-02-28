@@ -1,6 +1,5 @@
 package pl.mkjb.exchange.service;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,14 +18,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class CurrencyRateFetchService {
     private final RestClient futureProcessingRestClient;
     private final CurrencyRateRepository currencyRateRepository;
     private final CurrencyRepository currencyRepository;
 
-    @Scheduled(fixedRate = 20000)
-    private void updateCurrenciesRates() {
+    @Scheduled(fixedRateString = "${pl.mkjb.exchange.service.CurrencyRateFetchService.fixedDelay.in.milliseconds}")
+    public void updateCurrenciesRates() {
         final CurrencyRatesModel currenciesRates = futureProcessingRestClient.getCurrenciesRates();
         if (isNewCurrencyRateAvailable(currenciesRates)) {
             currencyRateRepository.archiveCurrencyRates();

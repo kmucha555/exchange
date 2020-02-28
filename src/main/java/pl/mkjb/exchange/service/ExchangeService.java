@@ -22,7 +22,7 @@ public class ExchangeService {
     private final UserService userService;
     private final CurrencyService currencyService;
 
-    public void saveTransaction(TransactionBuilder transactionBuilder) {
+    public Set<TransactionEntity> prepareTransactionToSave(TransactionBuilder transactionBuilder) {
         final CurrencyEntity baseCurrencyEntity = currencyService.findBaseCurrencyRate().getCurrencyEntity();
         final CurrencyEntity currencyEntity = currencyService.findCurrencyById(transactionBuilder.getCurrencyRateEntity().getCurrencyEntity().getId());
         final UserEntity exchangeOwner = userService.findOwner();
@@ -30,7 +30,7 @@ public class ExchangeService {
 
         BigDecimal transactionBaseCurrencyAmount = calculateBaseCurrencyAmount(transactionBuilder, currencyEntity);
 
-        final Set<TransactionEntity> transactionEntities = Set.of(
+        return Set.of(
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         userEntity,
@@ -59,7 +59,7 @@ public class ExchangeService {
                         transactionBuilder.getTransactionType().equals(TransactionType.BUY) ?
                                 transactionBaseCurrencyAmount : transactionBaseCurrencyAmount.negate()));
 
-        save(transactionEntities);
+
     }
 
     private BigDecimal calculateBaseCurrencyAmount(TransactionBuilder transactionBuilder, CurrencyEntity currencyEntity) {
@@ -77,7 +77,7 @@ public class ExchangeService {
                         .build();
     }
 
-    private void save(Set<TransactionEntity> transactionEntities) {
+    public void saveTransaction(Set<TransactionEntity> transactionEntities) {
         transactionRepository.saveAll(transactionEntities);
     }
 }

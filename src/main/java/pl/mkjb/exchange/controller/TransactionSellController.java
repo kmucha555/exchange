@@ -46,10 +46,12 @@ public class TransactionSellController {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Given currency rate has been archived");
             return REDIRECT_URL;
         }
+
         if (walletService.hasInsufficientFundsForSellCurrency(currencyRateId, authenticatedUser.getId())) {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Insufficient funds");
             return REDIRECT_URL;
         }
+
         model.addAttribute(MODEL_NAME, transactionSellService.getTransactionModel(currencyRateId, authenticatedUser.getId()));
         return VIEW_NAME;
     }
@@ -63,6 +65,12 @@ public class TransactionSellController {
         if (bindingResult.hasErrors()) {
             return VIEW_NAME;
         }
+
+        if (currencyService.isArchivedCurrencyRate(transactionModel.getCurrencyRateId())) {
+            redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Transaction failed! Given currency rate has been archived. Try again.");
+            return REDIRECT_URL;
+        }
+
         if (transactionSellService.hasErrors(transactionModel, authenticatedUser.getId())) {
             bindingResult.rejectValue("transactionAmount", "error.user", wrongAmount);
             return VIEW_NAME;

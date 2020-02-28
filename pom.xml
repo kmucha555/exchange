@@ -18,6 +18,7 @@
         <java.version>11</java.version>
         <vavr.version>0.10.2</vavr.version>
         <passay.version>1.5.0</passay.version>
+        <awaitility.version>3.1.6</awaitility.version>
     </properties>
 
     <dependencies>
@@ -80,6 +81,12 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -1,7 +1,5 @@
 package pl.mkjb.exchange.service;
 
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,7 +19,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Mockito.when;
 
-@Slf4j
 class WalletServiceTest {
     private CurrencyService currencyServiceMock = Mockito.mock(CurrencyService.class);
     private TransactionRepository transactionRepositoryMock = Mockito.mock(TransactionRepository.class);
@@ -81,14 +78,14 @@ class WalletServiceTest {
     @Test
     void givenZeroInUserWalletForBaseCurrency_whenTestingUserHasInsufficientFunds_thenReturnTrue() {
         //given
-        val userWalletCurrencyAmount = BigDecimal.ZERO;
-        val userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, BigDecimal.ONE));
+        var userWalletCurrencyAmount = BigDecimal.ZERO;
+        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, BigDecimal.ONE));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(currencyServiceMock.findBaseCurrencyRate()).thenReturn(baseCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
 
         //when
-        final boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, userId);
+        boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, userId);
 
         //then
         assertThat(test, equalTo(true));
@@ -97,14 +94,14 @@ class WalletServiceTest {
     @Test
     void givenGreaterThanZeroInUserWalletForBaseCurrency_whenTestingUserHasInsufficientFunds_thenReturnFalse() {
         //given
-        val userWalletCurrencyAmount = BigDecimal.TEN;
-        val userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, baseCurrencyPurchasePrice));
+        var userWalletCurrencyAmount = BigDecimal.TEN;
+        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, baseCurrencyPurchasePrice));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(currencyServiceMock.findBaseCurrencyRate()).thenReturn(baseCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
 
         //when
-        final boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, userId);
+        boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, userId);
 
         //then
         assertThat(test, equalTo(false));
@@ -113,8 +110,8 @@ class WalletServiceTest {
     @Test
     void givenGreaterThanZeroAmountInUserWalletForBaseCurrency_whenGetWalletAmountForBaseCurrency_thenReturnInputAmount() {
         //given
-        val userWalletCurrencyAmount = BigDecimal.TEN;
-        val userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, baseCurrencyPurchasePrice));
+        var userWalletCurrencyAmount = BigDecimal.TEN;
+        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, baseCurrencyPurchasePrice));
         when(currencyServiceMock.findBaseCurrencyRate()).thenReturn(baseCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
 
@@ -128,8 +125,8 @@ class WalletServiceTest {
     @Test
     void givenGreaterThanZeroAmountInUserWalletForCurrency_whenGetWalletAmountForCurrency_thenReturnInputAmount() {
         //given
-        val userWalletCurrencyAmount = BigDecimal.TEN;
-        val userWallet = Set.of(new WalletModel(currencyRateId, "USD", 1, userWalletCurrencyAmount, currencyPurchasePrice));
+        var userWalletCurrencyAmount = BigDecimal.TEN;
+        var userWallet = Set.of(new WalletModel(currencyRateId, "USD", 1, userWalletCurrencyAmount, currencyPurchasePrice));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
 
@@ -143,9 +140,9 @@ class WalletServiceTest {
     @Test
     void givenMockedUserWallet_whenGetUserWalletIsCalled_thenReturnUserWallet() {
         //given
-        val userWalletCurrencyAmountUSD = BigDecimal.valueOf(1000);
+        var userWalletCurrencyAmountUSD = BigDecimal.valueOf(1000);
 
-        val currencyRateEntityCZK =
+        var currencyRateEntityCZK =
                 new CurrencyRateEntity(
                         currencyRateId,
                         currencyEntity,
@@ -156,10 +153,10 @@ class WalletServiceTest {
                         Boolean.TRUE,
                         createdAt);
 
-        val currencyModels = Set.of(
+        var currencyModels = Set.of(
                 CurrencyModel.buildCurrencyModel(currencyRateEntityCZK));
-        val currencyRatesModel = CurrencyRatesModel.of(publicationDate, currencyModels);
-        val userWallet = Set.of(
+        var currencyRatesModel = CurrencyRatesModel.of(publicationDate, currencyModels);
+        var userWallet = Set.of(
                 new WalletModel(currencyRateId, "USD", 1, userWalletCurrencyAmountUSD, currencyPurchasePrice)
         );
 
@@ -168,7 +165,7 @@ class WalletServiceTest {
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
 
         //when
-        final Set<WalletModel> test = walletService.getUserWallet(userId);
+        Set<WalletModel> test = walletService.getUserWallet(userId);
 
         //then
         assertThat(test, equalTo(userWallet));
