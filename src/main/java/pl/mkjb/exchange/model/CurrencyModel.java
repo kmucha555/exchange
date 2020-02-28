@@ -18,7 +18,7 @@ public class CurrencyModel {
     private int currencyId;
     private String name;
     private String code;
-    private int unit;
+    private BigDecimal unit;
     private BigDecimal purchasePrice;
     private BigDecimal sellPrice;
     private BigDecimal averagePrice;

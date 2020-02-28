@@ -44,8 +44,8 @@ class WalletServiceTest {
         baseCurrencyRateId = UUID.randomUUID();
         publicationDate = LocalDateTime.of(2020, 2, 26, 17, 20, 5);
         createdAt = LocalDateTime.of(2020, 2, 26, 17, 20, 20);
-        currencyEntity = new CurrencyEntity(1, "US Dollar", "USD", 1, false);
-        baseCurrencyEntity = new CurrencyEntity(2, "Polish zloty", "PLN", 1, true);
+        currencyEntity = new CurrencyEntity(1, "US Dollar", "USD", BigDecimal.ONE, false);
+        baseCurrencyEntity = new CurrencyEntity(2, "Polish zloty", "PLN", BigDecimal.ONE, true);
         currencySellPrice = BigDecimal.valueOf(3.7392);
         currencyPurchasePrice = BigDecimal.valueOf(3.7222);
         currencyAveragePrice = BigDecimal.valueOf(3.7300);
@@ -79,7 +79,7 @@ class WalletServiceTest {
     void givenZeroInUserWalletForBaseCurrency_whenTestingUserHasInsufficientFunds_thenReturnTrue() {
         //given
         var userWalletCurrencyAmount = BigDecimal.ZERO;
-        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, BigDecimal.ONE));
+        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, BigDecimal.ONE));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(currencyServiceMock.findBaseCurrencyRate()).thenReturn(baseCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
@@ -95,7 +95,7 @@ class WalletServiceTest {
     void givenGreaterThanZeroInUserWalletForBaseCurrency_whenTestingUserHasInsufficientFunds_thenReturnFalse() {
         //given
         var userWalletCurrencyAmount = BigDecimal.TEN;
-        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, baseCurrencyPurchasePrice));
+        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, baseCurrencyPurchasePrice));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(currencyServiceMock.findBaseCurrencyRate()).thenReturn(baseCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
@@ -111,7 +111,7 @@ class WalletServiceTest {
     void givenGreaterThanZeroAmountInUserWalletForBaseCurrency_whenGetWalletAmountForBaseCurrency_thenReturnInputAmount() {
         //given
         var userWalletCurrencyAmount = BigDecimal.TEN;
-        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", 1, userWalletCurrencyAmount, baseCurrencyPurchasePrice));
+        var userWallet = Set.of(new WalletModel(baseCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, baseCurrencyPurchasePrice));
         when(currencyServiceMock.findBaseCurrencyRate()).thenReturn(baseCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
 
@@ -126,7 +126,7 @@ class WalletServiceTest {
     void givenGreaterThanZeroAmountInUserWalletForCurrency_whenGetWalletAmountForCurrency_thenReturnInputAmount() {
         //given
         var userWalletCurrencyAmount = BigDecimal.TEN;
-        var userWallet = Set.of(new WalletModel(currencyRateId, "USD", 1, userWalletCurrencyAmount, currencyPurchasePrice));
+        var userWallet = Set.of(new WalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmount, currencyPurchasePrice));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
 
@@ -157,7 +157,7 @@ class WalletServiceTest {
                 CurrencyModel.buildCurrencyModel(currencyRateEntityCZK));
         var currencyRatesModel = CurrencyRatesModel.of(publicationDate, currencyModels);
         var userWallet = Set.of(
-                new WalletModel(currencyRateId, "USD", 1, userWalletCurrencyAmountUSD, currencyPurchasePrice)
+                new WalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmountUSD, currencyPurchasePrice)
         );
 
         when(currencyServiceMock.findBaseCurrencyRate()).thenReturn(baseCurrencyRateEntity);

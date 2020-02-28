@@ -16,7 +16,7 @@ import java.util.UUID;
 public class TransactionModel {
     private UUID currencyRateId;
     private String currencyCode;
-    private int currencyUnit;
+    private BigDecimal currencyUnit;
     private BigDecimal transactionPrice;
     private BigDecimal userWalletAmount;
 

@@ -64,7 +64,7 @@ public class ExchangeService {
 
     private BigDecimal calculateBaseCurrencyAmount(TransactionBuilder transactionBuilder, CurrencyEntity currencyEntity) {
         return transactionBuilder.getTransactionAmount().multiply(transactionBuilder.getTransactionPrice())
-                .divide(BigDecimal.valueOf(currencyEntity.getUnit()), HALF_UP);
+                .divide(currencyEntity.getUnit(), HALF_UP);
     }
 
     private Function4<CurrencyEntity, UserEntity, BigDecimal, BigDecimal, TransactionEntity> prepareTransactionEntity() {

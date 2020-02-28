@@ -33,7 +33,7 @@ public class TransactionBuyService implements Transaction {
         val buyAmount = transactionModel.getTransactionAmount();
 
         return buyAmount.compareTo(BigDecimal.ZERO) <= 0 ||
-                buyAmount.remainder(BigDecimal.valueOf(currencyRateEntity.getCurrencyEntity().getUnit())).compareTo(BigDecimal.ZERO) != 0 ||
+                buyAmount.remainder(currencyRateEntity.getCurrencyEntity().getUnit()).compareTo(BigDecimal.ZERO) != 0 ||
                 buyAmount.compareTo(estimateMaxTransactionAmount(currencyRateEntity, userId)) > 0;
     }
 
@@ -56,7 +56,7 @@ public class TransactionBuyService implements Transaction {
         val exchangeCurrencyAmount = calculateAvailableCurrency(currencyRateEntity.getCurrencyEntity().getId());
 
         return userWalletAmount.divide(currencyRateEntity.getSellPrice(), 0, RoundingMode.DOWN)
-                .multiply(BigDecimal.valueOf(currencyRateEntity.getCurrencyEntity().getUnit()))
+                .multiply(currencyRateEntity.getCurrencyEntity().getUnit())
                 .min(exchangeCurrencyAmount);
     }
 

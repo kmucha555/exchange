@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Builder
 @AllArgsConstructor
@@ -24,8 +25,8 @@ public class CurrencyEntity {
     @Column(length = 3, nullable = false)
     private String code;
 
-    @Column(nullable = false)
-    private Integer unit;
+    @Column(nullable = false, precision = 4, scale = 0)
+    private BigDecimal unit;
 
     @Column(name = "base_currency", nullable = false)
     private Boolean baseCurrency;

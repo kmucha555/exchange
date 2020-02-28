@@ -13,7 +13,7 @@ import java.util.UUID;
 public class WalletModel {
     private UUID currencyRateId;
     private String code;
-    private int unit;
+    private BigDecimal unit;
     private BigDecimal amount;
     private BigDecimal purchasePrice;
 

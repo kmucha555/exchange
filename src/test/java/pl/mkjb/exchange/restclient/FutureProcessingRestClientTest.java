@@ -39,7 +39,7 @@ class FutureProcessingRestClientTest {
         val currencyRateEntityUSD =
                 new CurrencyRateEntity(
                         UUID.randomUUID(),
-                        new CurrencyEntity(1, "US Dollar", "USD", 1, false),
+                        new CurrencyEntity(1, "US Dollar", "USD", BigDecimal.ONE, false),
                         userWalletCurrencyAmountUSD,
                         BigDecimal.ONE,
                         userWalletCurrencyPurchasePriceUSD,

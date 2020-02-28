@@ -37,8 +37,8 @@ class ExchangeServiceTest {
         UUID currencyRateId = UUID.randomUUID();
         var publicationDate = LocalDateTime.of(2020, 2, 26, 17, 20, 5);
         var createdAt = LocalDateTime.of(2020, 2, 26, 17, 20, 20);
-        CurrencyEntity currencyEntity = new CurrencyEntity(1, "US Dollar", "USD", 1, false);
-        CurrencyEntity baseCurrencyEntity = new CurrencyEntity(2, "Polish zloty", "PLN", 1, true);
+        CurrencyEntity currencyEntity = new CurrencyEntity(1, "US Dollar", "USD", BigDecimal.ONE, false);
+        CurrencyEntity baseCurrencyEntity = new CurrencyEntity(2, "Polish zloty", "PLN", BigDecimal.ONE, true);
         var currencySellPrice = BigDecimal.valueOf(3.7392);
         var currencyPurchasePrice = BigDecimal.valueOf(3.7222);
         var currencyAveragePrice = BigDecimal.valueOf(3.7300);
@@ -98,7 +98,7 @@ class ExchangeServiceTest {
                 .build();
 
         var transactionBaseCurrencyAmount = transactionBuilder.getTransactionAmount().multiply(transactionBuilder.getTransactionPrice())
-                .divide(BigDecimal.valueOf(currencyEntity.getUnit()), HALF_UP);
+                .divide(currencyEntity.getUnit(), HALF_UP);
 
         var transactionOne = TransactionEntity.builder()
                 .currencyEntity(currencyEntity)

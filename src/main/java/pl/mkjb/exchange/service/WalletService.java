@@ -78,7 +78,7 @@ public class WalletService {
 
     public boolean hasInsufficientFundsForBuyCurrency(UUID currencyId, long userId) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyId);
-        val minimalTransactionAmount = currencyRateEntity.getSellPrice().multiply(BigDecimal.valueOf(currencyRateEntity.getCurrencyEntity().getUnit()));
+        val minimalTransactionAmount = currencyRateEntity.getSellPrice().multiply(currencyRateEntity.getCurrencyEntity().getUnit());
         return getUserWalletAmountForBaseCurrency(userId).compareTo(minimalTransactionAmount) < 1;
     }
 
