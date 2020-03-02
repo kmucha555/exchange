@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import pl.mkjb.exchange.entity.*;
 import pl.mkjb.exchange.model.TransactionBuilder;
 import pl.mkjb.exchange.repository.TransactionRepository;
+import pl.mkjb.exchange.security.CustomUser;
 import pl.mkjb.exchange.util.Role;
 import pl.mkjb.exchange.util.TransactionType;
 
@@ -32,6 +33,7 @@ class ExchangeServiceTest {
         //given
         int currencyId = 1;
         long userId = 1;
+        String username = "test-user";
         long ownerId = 2;
         UUID billingCurrencyRateId = UUID.randomUUID();
         UUID currencyRateId = UUID.randomUUID();
@@ -43,6 +45,18 @@ class ExchangeServiceTest {
         var currencyPurchasePrice = BigDecimal.valueOf(3.7222);
         var currencyAveragePrice = BigDecimal.valueOf(3.7300);
         var transactionAmount = BigDecimal.TEN;
+
+        var userDetails = CustomUser.buildCustomUser()
+                .id(userId)
+                .username(username)
+                .fullName(username)
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .enabled(true)
+                .password(username)
+                .authorities(Set.of())
+                .build();
 
         var currencyRateEntity = new CurrencyRateEntity(
                 currencyRateId,
@@ -66,7 +80,8 @@ class ExchangeServiceTest {
 
         var roleEntityUser = new RoleEntity(1, Role.ROLE_USER.name());
         var roleEntityOwner = new RoleEntity(2, Role.ROLE_OWNER.name());
-        var userEntity = new UserEntity(userId,
+        var userEntity = new UserEntity(
+                1L,
                 "Mock",
                 "Mock",
                 "Mock",
@@ -87,14 +102,14 @@ class ExchangeServiceTest {
         when(currencyServiceMock.findCurrencyById(currencyId)).thenReturn(currencyEntity);
         when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
         when(userServiceMock.findOwner()).thenReturn(exchangeOwnerEntity);
-        when(userServiceMock.findById(userId)).thenReturn(userEntity);
+        when(userServiceMock.findByUsername(username)).thenReturn(userEntity);
 
         var transactionBuilder = TransactionBuilder.builder()
                 .currencyRateEntity(currencyRateEntity)
                 .transactionAmount(transactionAmount)
                 .transactionPrice(currencyPurchasePrice)
                 .transactionType(TransactionType.SELL)
-                .userId(userId)
+                .userDetails(userDetails)
                 .build();
 
         var transactionBillingCurrencyAmount = transactionBuilder.getTransactionAmount().multiply(transactionBuilder.getTransactionPrice())

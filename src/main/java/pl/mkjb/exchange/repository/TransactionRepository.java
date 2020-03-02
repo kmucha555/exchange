@@ -18,9 +18,9 @@ public interface TransactionRepository extends CrudRepository<TransactionEntity,
             "new pl.mkjb.exchange.model.WalletModel(" +
             "t.currencyEntity.code, " +
             "sum(t.amount)) " +
-            "from TransactionEntity t where t.userEntity.id = :userId " +
+            "from TransactionEntity t where t.userEntity.username = :username " +
             "group by t.currencyEntity.id")
-    Set<WalletModel> findUserWallet(@Param("userId") Long userId);
+    Set<WalletModel> findUserWallet(@Param("username") String username);
 
     @Query("select sum(t.amount) from TransactionEntity t where t.userEntity.id = :userId and t.currencyEntity.id = :currencyId")
     Option<BigDecimal> sumCurrencyAmountForUser(@Param("userId") Long userId, @Param("currencyId") Integer currencyId);

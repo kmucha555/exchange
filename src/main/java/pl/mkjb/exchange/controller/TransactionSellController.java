@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mkjb.exchange.model.TransactionModel;
-import pl.mkjb.exchange.security.CustomAuthenticatedUser;
+import pl.mkjb.exchange.security.CustomUser;
 import pl.mkjb.exchange.service.CurrencyService;
 import pl.mkjb.exchange.service.Transaction;
 import pl.mkjb.exchange.service.WalletService;
@@ -40,19 +40,19 @@ public class TransactionSellController {
     public String showBuyForm(@PathVariable UUID currencyRateId,
                               Model model,
                               RedirectAttributes redirectAttributes,
-                              @AuthenticationPrincipal CustomAuthenticatedUser authenticatedUser) {
+                              @AuthenticationPrincipal CustomUser customUser) {
 
         if (currencyService.isArchivedCurrencyRate(currencyRateId)) {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Given currency rate has been archived");
             return REDIRECT_URL;
         }
 
-        if (walletService.hasInsufficientFundsForSellCurrency(currencyRateId, authenticatedUser.getId())) {
+        if (walletService.hasInsufficientFundsForSellCurrency(currencyRateId, customUser)) {
             redirectAttributes.addFlashAttribute(MESSAGE_FAILED, "Insufficient funds");
             return REDIRECT_URL;
         }
 
-        model.addAttribute(MODEL_NAME, transactionSellService.getTransactionModel(currencyRateId, authenticatedUser.getId()));
+        model.addAttribute(MODEL_NAME, transactionSellService.getTransactionModel(currencyRateId, customUser));
         return VIEW_NAME;
     }
 
@@ -60,7 +60,7 @@ public class TransactionSellController {
     public String buyCurrency(@Valid TransactionModel transactionModel,
                               BindingResult bindingResult,
                               RedirectAttributes redirectAttributes,
-                              @AuthenticationPrincipal CustomAuthenticatedUser authenticatedUser) {
+                              @AuthenticationPrincipal CustomUser customUser) {
 
         if (bindingResult.hasErrors()) {
             return VIEW_NAME;
@@ -71,12 +71,12 @@ public class TransactionSellController {
             return REDIRECT_URL;
         }
 
-        if (transactionSellService.hasErrors(transactionModel, authenticatedUser.getId())) {
+        if (transactionSellService.hasErrors(transactionModel, customUser)) {
             bindingResult.rejectValue("transactionAmount", "error.user", wrongAmount);
             return VIEW_NAME;
         }
 
-        transactionSellService.saveTransaction(transactionModel, authenticatedUser.getId());
+        transactionSellService.saveTransaction(transactionModel, customUser);
         redirectAttributes.addFlashAttribute(MESSAGE_SUCCESS,
                 String.format("Success! You sold %s %s", transactionModel.getTransactionAmount(), transactionModel.getCurrencyCode()));
 

@@ -1,7 +1,9 @@
 package pl.mkjb.exchange.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 import static pl.mkjb.exchange.util.Role.ROLE_OWNER;
 import static pl.mkjb.exchange.util.Role.ROLE_USER;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -49,9 +52,20 @@ public class UserService {
         addFundsForUserForDemonstration(savedUserEntity);
     }
 
+    public UserEntity findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.error("Given username not found: {}", username);
+                    throw new UsernameNotFoundException("Given username not found: " + username);
+                });
+    }
+
     public UserEntity findById(long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new BadResourceException("Given user id doesn't exist" + id));
+                .orElseThrow(() -> {
+                    log.error("Given user id not found: {}", id);
+                    throw new BadResourceException("Given user id doesn't exist" + id);
+                });
     }
 
     public UserEntity findOwner() {
@@ -59,12 +73,18 @@ public class UserService {
         return findUsersByRole(roleEntity)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new BadResourceException("User with ROLE_OWNER doesn't exists"));
+                .orElseThrow(() -> {
+                    log.error("User with ROLE_OWNER not found");
+                    throw new BadResourceException("User with ROLE_OWNER not found");
+                });
     }
 
     private RoleEntity findRoleByName(Role role) {
         return roleRepository.findByRole(role.name())
-                .getOrElseThrow(() -> new BadResourceException("Given role name doesn't exist" + role));
+                .getOrElseThrow(() -> {
+                    log.error("User with ROLE_OWNER not found");
+                    throw new BadResourceException("User with {} not found" + role);
+                });
     }
 
     private Set<UserEntity> findUsersByRole(RoleEntity roleEntity) {

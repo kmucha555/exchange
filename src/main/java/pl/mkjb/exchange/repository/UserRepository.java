@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
-    Optional<UserEntity> findByUsername(String userName);
+    Optional<UserEntity> findByUsername(String username);
+
     Set<UserEntity> findByRolesContaining(RoleEntity roleEntity);
 }

@@ -3,6 +3,7 @@ package pl.mkjb.exchange.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
@@ -28,31 +29,34 @@ public class TransactionBuyService implements Transaction {
     private final TransactionRepository transactionRepository;
 
     @Override
-    public boolean hasErrors(TransactionModel transactionModel, long userId) {
+    public boolean hasErrors(TransactionModel transactionModel, UserDetails userDetails) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
         val buyAmount = transactionModel.getTransactionAmount();
 
         return buyAmount.compareTo(BigDecimal.ZERO) <= 0 ||
                 buyAmount.remainder(currencyRateEntity.getCurrencyEntity().getUnit()).compareTo(BigDecimal.ZERO) != 0 ||
-                buyAmount.compareTo(estimateMaxTransactionAmount(currencyRateEntity, userId)) > 0;
+                buyAmount.compareTo(estimateMaxTransactionAmount(currencyRateEntity, userDetails)) > 0;
     }
 
     @Override
-    public TransactionModel getTransactionModel(UUID currencyRateId, long userId) {
+    public TransactionModel getTransactionModel(UUID currencyRateId, UserDetails userDetails) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyRateId);
+        val userWalletAmountForBillingCurrency = walletService.getUserWalletAmountForBillingCurrency(userDetails);
+        val maxAllowedTransactionAmount = estimateMaxTransactionAmount(currencyRateEntity, userDetails);
 
         return TransactionModel.builder()
                 .currencyRateId(currencyRateEntity.getId())
                 .currencyCode(currencyRateEntity.getCurrencyEntity().getCode())
                 .currencyUnit(currencyRateEntity.getCurrencyEntity().getUnit())
                 .transactionPrice(currencyRateEntity.getSellPrice())
-                .userWalletAmount(walletService.getUserWalletAmountForBillingCurrency(userId))
-                .maxAllowedTransactionAmount(estimateMaxTransactionAmount(currencyRateEntity, userId))
+                .userWalletAmount(userWalletAmountForBillingCurrency)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
                 .build();
     }
 
-    private BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, long userId) {
-        val userWalletAmount = walletService.getUserWalletAmountForBillingCurrency(userId);
+    private BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
+        val userWalletAmount = walletService.getUserWalletAmountForBillingCurrency(userDetails);
+
         val exchangeCurrencyAmount = calculateAvailableCurrency(currencyRateEntity.getCurrencyEntity().getId());
 
         return userWalletAmount.divide(currencyRateEntity.getSellPrice(), 0, RoundingMode.DOWN)
@@ -60,26 +64,25 @@ public class TransactionBuyService implements Transaction {
                 .min(exchangeCurrencyAmount);
     }
 
-    public BigDecimal calculateAvailableCurrency(int currencyId, long userId) {
-        val userEntity = userService.findById(userId);
+    public BigDecimal calculateAvailableCurrency(int currencyId, UserEntity userEntity) {
         return transactionRepository.sumCurrencyAmountForUser(userEntity.getId(), currencyId)
                 .getOrElse(BigDecimal.ZERO);
     }
 
     private BigDecimal calculateAvailableCurrency(int currencyId) {
         final UserEntity ownerEntity = userService.findOwner();
-        return calculateAvailableCurrency(currencyId, ownerEntity.getId());
+        return calculateAvailableCurrency(currencyId, ownerEntity);
     }
 
     @Override
     @Transactional
-    public void saveTransaction(TransactionModel transactionModel, long userId) {
+    public void saveTransaction(TransactionModel transactionModel, UserDetails userDetails) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
         val transactionBuilder = TransactionBuilder.builder()
                 .currencyRateEntity(currencyRateEntity)
                 .transactionAmount(transactionModel.getTransactionAmount())
                 .transactionPrice(currencyRateEntity.getSellPrice())
-                .userId(userId)
+                .userDetails(userDetails)
                 .transactionType(BUY)
                 .build();
         val transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);

@@ -15,7 +15,7 @@ public class ExceptionHandlingController {
     @ExceptionHandler({BadResourceException.class, IllegalArgumentException.class,
             UsernameNotFoundException.class})
     public String handleException(HttpServletRequest request, RuntimeException exception) {
-        log.error("Request: {} raised {}", request.getRequestURL(), exception.getMessage());
+        log.error("Request: {} raised exception. Message: {}", request.getRequestURL(), exception.getMessage());
         return "errors/404";
     }
 }

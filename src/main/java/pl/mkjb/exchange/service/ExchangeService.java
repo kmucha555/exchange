@@ -26,7 +26,7 @@ public class ExchangeService {
         final CurrencyEntity billingCurrencyEntity = currencyService.findBillingCurrencyRate().getCurrencyEntity();
         final CurrencyEntity currencyEntity = currencyService.findCurrencyById(transactionBuilder.getCurrencyRateEntity().getCurrencyEntity().getId());
         final UserEntity exchangeOwner = userService.findOwner();
-        final UserEntity userEntity = userService.findById(transactionBuilder.getUserId());
+        final UserEntity userEntity = userService.findByUsername(transactionBuilder.getUserDetails().getUsername());
 
         BigDecimal transactionBillingCurrencyAmount = calculateBillingCurrencyAmount(transactionBuilder, currencyEntity);
 
