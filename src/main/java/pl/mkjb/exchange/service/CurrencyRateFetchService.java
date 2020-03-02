@@ -12,7 +12,6 @@ import pl.mkjb.exchange.repository.CurrencyRateRepository;
 import pl.mkjb.exchange.repository.CurrencyRepository;
 import pl.mkjb.exchange.restclient.RestClient;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,15 +25,20 @@ public class CurrencyRateFetchService {
 
     @Scheduled(fixedRateString = "${pl.mkjb.exchange.service.CurrencyRateFetchService.fixedDelay.in.milliseconds}")
     public void updateCurrenciesRates() {
-        final CurrencyRatesModel currenciesRates = futureProcessingRestClient.getCurrenciesRates();
-        if (isNewCurrencyRateAvailable(currenciesRates)) {
-            currencyRateRepository.archiveCurrencyRates();
-            currencyRateRepository.saveAll(buildCurrencyRateEntity(currenciesRates));
-            log.info("New exchange rates available. Saving to database.");
-        }
+        futureProcessingRestClient.getCurrenciesRates()
+                .filter(this::hasNewCurrencyRatesBundleBeenPublished)
+                .peek(currenciesRates -> currencyRateRepository.archiveCurrencyRates())
+                .map(this::buildCurrenciesRatesEntities)
+                .map(currencyRateRepository::saveAll)
+                .peek(currenciesRates -> log.info("New exchange rates available. Saving to database: {}", currenciesRates))
+                .onEmpty(() -> log.info("No new exchange rates has been published"));
     }
 
-    private Set<CurrencyRateEntity> buildCurrencyRateEntity(CurrencyRatesModel currenciesRates) {
+    private boolean hasNewCurrencyRatesBundleBeenPublished(CurrencyRatesModel currencyRatesModel) {
+        return currencyRateRepository.countByPublicationDate(currencyRatesModel.getPublicationDate()) == 0;
+    }
+
+    private Set<CurrencyRateEntity> buildCurrenciesRatesEntities(CurrencyRatesModel currenciesRates) {
         return currenciesRates.getItems()
                 .stream()
                 .map(currencyModel -> CurrencyRateEntity.builder()
@@ -53,10 +57,5 @@ public class CurrencyRateFetchService {
                     log.error("Missing currency code {}", currencyModel);
                     throw new IllegalArgumentException("Missing currency code");
                 });
-    }
-
-    private boolean isNewCurrencyRateAvailable(CurrencyRatesModel currencyRatesModel) {
-        final LocalDateTime publicationDate = currencyRatesModel.getPublicationDate();
-        return currencyRateRepository.countByPublicationDate(publicationDate) == 0;
     }
 }

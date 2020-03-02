@@ -27,16 +27,18 @@ public class TransactionAmountValidator implements ConstraintValidator<Transacti
     @Override
     public boolean isValid(TransactionModel transactionModel, ConstraintValidatorContext context) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
-        val buyAmount = transactionModel.getTransactionAmount();
         val customUser = (CustomUser) authentication.getPrincipal();
+
         val transactionType = transactionModel.getTransactionTypeConstant();
+
+        val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
+        val currencyUnit = currencyRateEntity.getCurrencyEntity().getUnit();
+        val buyAmount = transactionModel.getTransactionAmount();
         val maxTransactionAmount = transactionFacadeService.estimateMaxTransactionAmount()
                 .apply(transactionType)
                 .apply(currencyRateEntity, customUser);
-        val currencyUnit = currencyRateEntity.getCurrencyEntity().getUnit();
 
-        boolean isValid = buyAmount.compareTo(BigDecimal.ZERO) > 0 &&
+        val isValid = buyAmount.compareTo(BigDecimal.ZERO) > 0 &&
                 buyAmount.remainder(currencyUnit).compareTo(BigDecimal.ZERO) == 0 &&
                 buyAmount.compareTo(maxTransactionAmount) < 1;
 

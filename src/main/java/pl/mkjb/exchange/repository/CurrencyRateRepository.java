@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Repository
 public interface CurrencyRateRepository extends CrudRepository<CurrencyRateEntity, UUID> {
-    Long countByPublicationDate(LocalDateTime publicationDate);
+    long countByPublicationDate(LocalDateTime publicationDate);
 
     @Query("select cr from CurrencyRateEntity cr where cr.active = true and cr.currencyEntity.billingCurrency = false")
     Set<CurrencyRateEntity> findByActiveTrue();

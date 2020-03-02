@@ -43,11 +43,13 @@ public class UserService {
 
     @Transactional
     public void save(UserModel userModel) {
-        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         val roleEntity = findRoleByName(ROLE_USER);
         val userEntity = UserEntity.fromModel(userModel);
         userEntity.setRoles(Set.of(roleEntity));
+        userEntity.setPassword(passwordEncoder.encode(userModel.getPassword()));
+
         val savedUserEntity = userRepository.save(userEntity);
+
         saveInitialTransactions(savedUserEntity);
         addFundsForUserForDemonstration(savedUserEntity);
     }
@@ -60,17 +62,9 @@ public class UserService {
                 });
     }
 
-    public UserEntity findById(long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("Given user id not found: {}", id);
-                    throw new BadResourceException("Given user id doesn't exist" + id);
-                });
-    }
-
     public UserEntity findOwner() {
         val roleEntity = findRoleByName(ROLE_OWNER);
-        return findUsersByRole(roleEntity)
+        return userRepository.findByRolesContaining(roleEntity)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> {
@@ -82,15 +76,12 @@ public class UserService {
     private RoleEntity findRoleByName(RoleConstant roleConstant) {
         return roleRepository.findByRole(roleConstant.name())
                 .getOrElseThrow(() -> {
-                    log.error("User with ROLE_OWNER not found");
+                    log.error("User with {} not found", roleConstant);
                     throw new BadResourceException("User with {} not found" + roleConstant);
                 });
     }
 
-    private Set<UserEntity> findUsersByRole(RoleEntity roleEntity) {
-        return userRepository.findByRolesContaining(roleEntity);
-    }
-
+    //Only for demo purpose
     private void saveInitialTransactions(UserEntity userEntity) {
         val transactionEntities = currencyService.findAll()
                 .stream()
@@ -103,9 +94,11 @@ public class UserService {
                                 .createdAt(LocalDateTime.now())
                                 .build())
                 .collect(Collectors.toUnmodifiableSet());
+
         transactionRepository.saveAll(transactionEntities);
     }
 
+    //Only for demo purpose
     private void addFundsForUserForDemonstration(UserEntity userEntity) {
         val currencyEntity = currencyService.findBillingCurrencyRate().getCurrencyEntity();
         val transactionEntity = TransactionEntity.builder()

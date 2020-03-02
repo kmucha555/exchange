@@ -2,10 +2,10 @@ package pl.mkjb.exchange.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
+import pl.mkjb.exchange.entity.CurrencyRateEntity;
 import pl.mkjb.exchange.exception.BadResourceException;
 import pl.mkjb.exchange.model.CurrencyModel;
 import pl.mkjb.exchange.model.CurrencyRatesModel;
@@ -30,24 +30,26 @@ public class WalletService {
     }
 
     private Set<UserWalletModel> addNewestCurrencyRatesToUserWallet(Set<UserWalletModel> userWallet) {
-        val baseCurrencyRateEntity = currencyService.findBillingCurrencyRate();
+        final CurrencyRateEntity billingCurrencyRateEntity = currencyService.findBillingCurrencyRate();
         final CurrencyRatesModel currencyRatesModel = currencyService.getNewestRates();
+
         return userWallet.stream()
-                .filter(userWalletModel -> !userWalletModel.getCode().equals(baseCurrencyRateEntity.getCurrencyEntity().getCode()))
+                .filter(userWalletModel -> !userWalletModel.getCode().equals(billingCurrencyRateEntity.getCurrencyEntity().getCode()))
                 .map(userWalletModel -> {
-                    val walletCurrency = getCurrencyModelForWalletCurrency(currencyRatesModel, userWalletModel);
+                    final CurrencyModel currentWalletCurrency = getCurrencyModelForCurrentWalletCurrency(currencyRatesModel, userWalletModel);
+
                     return UserWalletModel.builder()
                             .amount(userWalletModel.getAmount())
                             .code(userWalletModel.getCode())
-                            .unit(walletCurrency.getUnit())
-                            .currencyRateId(walletCurrency.getCurrencyRateId())
-                            .purchasePrice(walletCurrency.getPurchasePrice())
+                            .unit(currentWalletCurrency.getUnit())
+                            .currencyRateId(currentWalletCurrency.getCurrencyRateId())
+                            .purchasePrice(currentWalletCurrency.getPurchasePrice())
                             .build();
                 })
                 .collect(Collectors.toUnmodifiableSet());
     }
 
-    private CurrencyModel getCurrencyModelForWalletCurrency(CurrencyRatesModel currencyRatesModel, UserWalletModel userWalletModel) {
+    private CurrencyModel getCurrencyModelForCurrentWalletCurrency(CurrencyRatesModel currencyRatesModel, UserWalletModel userWalletModel) {
         return currencyRatesModel.getItems()
                 .stream()
                 .filter(currencyModel -> currencyModel.getCode().equals(userWalletModel.getCode()))
@@ -56,15 +58,14 @@ public class WalletService {
     }
 
     public BigDecimal getUserWalletAmountForGivenCurrency(UUID currencyId, UserDetails userDetails) {
-        val currencyEntity =
-                currencyService.findCurrencyRateByCurrencyRateId(currencyId)
-                        .getCurrencyEntity();
+        final CurrencyEntity currencyEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyId)
+                .getCurrencyEntity();
 
         return getCurrencyAmount(userDetails, currencyEntity);
     }
 
     public BigDecimal getUserWalletAmountForBillingCurrency(UserDetails userDetails) {
-        val billingCurrencyEntity = currencyService.findBillingCurrencyRate().getCurrencyEntity();
+        final CurrencyEntity billingCurrencyEntity = currencyService.findBillingCurrencyRate().getCurrencyEntity();
         return getCurrencyAmount(userDetails, billingCurrencyEntity);
     }
 
@@ -78,8 +79,12 @@ public class WalletService {
     }
 
     public boolean hasInsufficientFundsForBuyCurrency(UUID currencyId, UserDetails userDetails) {
-        val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyId);
-        val minimalTransactionAmount = currencyRateEntity.getSellPrice().multiply(currencyRateEntity.getCurrencyEntity().getUnit());
+        final CurrencyRateEntity currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyId);
+        final BigDecimal minimalTransactionAmount = currencyRateEntity.getSellPrice()
+                .multiply(currencyRateEntity
+                        .getCurrencyEntity()
+                        .getUnit());
+
         return getUserWalletAmountForBillingCurrency(userDetails).compareTo(minimalTransactionAmount) < 1;
     }
 

@@ -58,10 +58,10 @@ public class TransactionFacadeService {
     }
 
     private Function2<CurrencyRateEntity, UserDetails, BigDecimal> estimateMaxBuyTransactionAmount() {
-        return transactionBuyService::estimateMaxTransactionAmount;
+        return transactionBuyService::estimateMaxAllowedTransactionAmountForUser;
     }
 
     private Function2<CurrencyRateEntity, UserDetails, BigDecimal> estimateMaxSellTransactionAmount() {
-        return transactionSellService::estimateMaxTransactionAmount;
+        return transactionSellService::estimateMaxAllowedTransactionAmountForUser;
     }
 }

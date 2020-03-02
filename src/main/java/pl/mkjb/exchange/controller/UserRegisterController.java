@@ -48,6 +48,7 @@ public class UserRegisterController {
         if (bindingResult.hasErrors()) {
             return VIEW_NAME;
         }
+
         userService.save(userModel);
         redirectAttributes.addFlashAttribute(MESSAGE, "Successfully registered");
         return REDIRECT_URL;

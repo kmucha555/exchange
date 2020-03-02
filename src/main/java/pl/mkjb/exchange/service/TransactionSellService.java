@@ -36,24 +36,25 @@ public class TransactionSellService implements Transaction {
                 .currencyUnit(currencyRateEntity.getCurrencyEntity().getUnit())
                 .transactionPrice(currencyRateEntity.getPurchasePrice())
                 .userWalletAmount(walletService.getUserWalletAmountForGivenCurrency(currencyRateId, userDetails).setScale(0, DOWN))
-                .maxAllowedTransactionAmount(estimateMaxTransactionAmount(currencyRateEntity, userDetails).setScale(0, DOWN))
+                .maxAllowedTransactionAmount(estimateMaxAllowedTransactionAmountForUser(currencyRateEntity, userDetails).setScale(0, DOWN))
                 .transactionTypeConstant(SELL)
                 .build();
     }
 
-    public BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
+    public BigDecimal estimateMaxAllowedTransactionAmountForUser(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
         val billingCurrencyRateEntity = currencyService.findBillingCurrencyRate();
         val userWalletAmount = walletService.getUserWalletAmountForGivenCurrency(currencyRateEntity.getId(), userDetails);
         val exchangeCurrencyAmount = calculateAvailableCurrency(billingCurrencyRateEntity)
                 .divide(currencyRateEntity.getPurchasePrice(), 0, DOWN)
                 .multiply(currencyRateEntity.getCurrencyEntity().getUnit());
+
         return userWalletAmount.min(exchangeCurrencyAmount);
     }
 
     private BigDecimal calculateAvailableCurrency(CurrencyRateEntity currencyRateEntity) {
-        final UserEntity ownerEntity = userService.findOwner();
+        final UserEntity userEntity = userService.findOwner();
         return transactionRepository
-                .sumCurrencyAmountForUser(ownerEntity.getId(), currencyRateEntity.getCurrencyEntity().getId())
+                .sumCurrencyAmountForUser(userEntity.getId(), currencyRateEntity.getCurrencyEntity().getId())
                 .getOrElse(BigDecimal.ZERO);
     }
 
@@ -69,6 +70,7 @@ public class TransactionSellService implements Transaction {
                 .transactionTypeConstant(SELL)
                 .build();
         val transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);
+
         exchangeService.saveTransaction(transactionEntities);
     }
 }

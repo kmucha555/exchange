@@ -8,12 +8,12 @@ import pl.mkjb.exchange.entity.TransactionEntity;
 import pl.mkjb.exchange.entity.UserEntity;
 import pl.mkjb.exchange.model.TransactionBuilder;
 import pl.mkjb.exchange.repository.TransactionRepository;
-import pl.mkjb.exchange.util.TransactionTypeConstant;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
 import static java.math.RoundingMode.HALF_UP;
+import static pl.mkjb.exchange.util.TransactionTypeConstant.BUY;
 
 @Service
 @RequiredArgsConstructor
@@ -28,42 +28,41 @@ public class ExchangeService {
         final UserEntity exchangeOwner = userService.findOwner();
         final UserEntity userEntity = userService.findByUsername(transactionBuilder.getUserDetails().getUsername());
 
-        BigDecimal transactionBillingCurrencyAmount = calculateBillingCurrencyAmount(transactionBuilder, currencyEntity);
+        final BigDecimal billingCurrencyTransactionAmount = calculateBillingCurrencyAmount(transactionBuilder, currencyEntity);
 
         return Set.of(
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         userEntity,
                         transactionBuilder.getTransactionPrice(),
-                        transactionBuilder.getTransactionTypeConstant().equals(TransactionTypeConstant.BUY) ?
+                        transactionBuilder.getTransactionTypeConstant().equals(BUY) ?
                                 transactionBuilder.getTransactionAmount() : transactionBuilder.getTransactionAmount().negate()),
 
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         exchangeOwner,
                         transactionBuilder.getTransactionPrice(),
-                        transactionBuilder.getTransactionTypeConstant().equals(TransactionTypeConstant.BUY) ?
+                        transactionBuilder.getTransactionTypeConstant().equals(BUY) ?
                                 transactionBuilder.getTransactionAmount().negate() : transactionBuilder.getTransactionAmount()),
 
                 prepareTransactionEntity().apply(
                         billingCurrencyEntity,
                         userEntity,
                         transactionBuilder.getTransactionPrice(),
-                        transactionBuilder.getTransactionTypeConstant().equals(TransactionTypeConstant.BUY) ?
-                                transactionBillingCurrencyAmount.negate() : transactionBillingCurrencyAmount),
+                        transactionBuilder.getTransactionTypeConstant().equals(BUY) ?
+                                billingCurrencyTransactionAmount.negate() : billingCurrencyTransactionAmount),
 
                 prepareTransactionEntity().apply(
                         billingCurrencyEntity,
                         exchangeOwner,
                         transactionBuilder.getTransactionPrice(),
-                        transactionBuilder.getTransactionTypeConstant().equals(TransactionTypeConstant.BUY) ?
-                                transactionBillingCurrencyAmount : transactionBillingCurrencyAmount.negate()));
-
-
+                        transactionBuilder.getTransactionTypeConstant().equals(BUY) ?
+                                billingCurrencyTransactionAmount : billingCurrencyTransactionAmount.negate()));
     }
 
     private BigDecimal calculateBillingCurrencyAmount(TransactionBuilder transactionBuilder, CurrencyEntity currencyEntity) {
-        return transactionBuilder.getTransactionAmount().multiply(transactionBuilder.getTransactionPrice())
+        return transactionBuilder.getTransactionAmount()
+                .multiply(transactionBuilder.getTransactionPrice())
                 .divide(currencyEntity.getUnit(), HALF_UP);
     }
 

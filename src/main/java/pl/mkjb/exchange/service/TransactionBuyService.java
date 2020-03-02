@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
+import pl.mkjb.exchange.entity.TransactionEntity;
 import pl.mkjb.exchange.entity.UserEntity;
 import pl.mkjb.exchange.model.TransactionBuilder;
 import pl.mkjb.exchange.model.TransactionModel;
@@ -14,6 +15,7 @@ import pl.mkjb.exchange.repository.TransactionRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Set;
 import java.util.UUID;
 
 import static pl.mkjb.exchange.util.TransactionTypeConstant.BUY;
@@ -31,38 +33,37 @@ public class TransactionBuyService implements Transaction {
     @Override
     public TransactionModel getTransactionModel(UUID currencyRateId, UserDetails userDetails) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyRateId);
-        val userWalletAmountForBillingCurrency = walletService.getUserWalletAmountForBillingCurrency(userDetails);
-        val maxAllowedTransactionAmount = estimateMaxTransactionAmount(currencyRateEntity, userDetails);
+        val userWalletAmountInBillingCurrency = walletService.getUserWalletAmountForBillingCurrency(userDetails);
+        val maxAllowedTransactionAmount = estimateMaxAllowedTransactionAmountForUser(currencyRateEntity, userDetails);
 
         return TransactionModel.builder()
                 .currencyRateId(currencyRateEntity.getId())
                 .currencyCode(currencyRateEntity.getCurrencyEntity().getCode())
                 .currencyUnit(currencyRateEntity.getCurrencyEntity().getUnit())
                 .transactionPrice(currencyRateEntity.getSellPrice())
-                .userWalletAmount(userWalletAmountForBillingCurrency)
+                .userWalletAmount(userWalletAmountInBillingCurrency)
                 .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
                 .transactionTypeConstant(BUY)
                 .build();
     }
 
-    public BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
-        val userWalletAmount = walletService.getUserWalletAmountForBillingCurrency(userDetails);
+    public BigDecimal estimateMaxAllowedTransactionAmountForUser(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
+        final BigDecimal userWalletAmount = walletService.getUserWalletAmountForBillingCurrency(userDetails);
+        final BigDecimal exchangeMaxCurrencyAmount = calculateAvailableCurrencyAmount(currencyRateEntity.getCurrencyEntity().getId());
+        final BigDecimal userWalletAmountInGivenCurrency = userWalletAmount.divide(currencyRateEntity.getSellPrice(), 0, RoundingMode.DOWN)
+                .multiply(currencyRateEntity.getCurrencyEntity().getUnit());
 
-        val exchangeCurrencyAmount = calculateAvailableCurrency(currencyRateEntity.getCurrencyEntity().getId());
-
-        return userWalletAmount.divide(currencyRateEntity.getSellPrice(), 0, RoundingMode.DOWN)
-                .multiply(currencyRateEntity.getCurrencyEntity().getUnit())
-                .min(exchangeCurrencyAmount);
+        return userWalletAmountInGivenCurrency.min(exchangeMaxCurrencyAmount);
     }
 
-    public BigDecimal calculateAvailableCurrency(int currencyId, UserEntity userEntity) {
+    public BigDecimal calculateAvailableCurrencyAmount(int currencyId, UserEntity userEntity) {
         return transactionRepository.sumCurrencyAmountForUser(userEntity.getId(), currencyId)
                 .getOrElse(BigDecimal.ZERO);
     }
 
-    private BigDecimal calculateAvailableCurrency(int currencyId) {
+    private BigDecimal calculateAvailableCurrencyAmount(int currencyId) {
         final UserEntity ownerEntity = userService.findOwner();
-        return calculateAvailableCurrency(currencyId, ownerEntity);
+        return calculateAvailableCurrencyAmount(currencyId, ownerEntity);
     }
 
     @Override
@@ -76,7 +77,8 @@ public class TransactionBuyService implements Transaction {
                 .userDetails(userDetails)
                 .transactionTypeConstant(BUY)
                 .build();
-        val transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);
+        final Set<TransactionEntity> transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);
+
         exchangeService.saveTransaction(transactionEntities);
     }
 }

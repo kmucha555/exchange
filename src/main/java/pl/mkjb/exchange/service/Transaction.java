@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface Transaction {
     TransactionModel getTransactionModel(UUID currencyRateId, UserDetails userDetails);
 
-    BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, UserDetails userDetails);
+    BigDecimal estimateMaxAllowedTransactionAmountForUser(CurrencyRateEntity currencyRateEntity, UserDetails userDetails);
 
     void saveTransaction(TransactionModel transactionModel, UserDetails userDetails);
 }
