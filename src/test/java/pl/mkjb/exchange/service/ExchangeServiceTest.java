@@ -7,8 +7,8 @@ import pl.mkjb.exchange.entity.*;
 import pl.mkjb.exchange.model.TransactionBuilder;
 import pl.mkjb.exchange.repository.TransactionRepository;
 import pl.mkjb.exchange.security.CustomUser;
-import pl.mkjb.exchange.util.Role;
-import pl.mkjb.exchange.util.TransactionType;
+import pl.mkjb.exchange.util.RoleConstant;
+import pl.mkjb.exchange.util.TransactionTypeConstant;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -78,8 +78,8 @@ class ExchangeServiceTest {
                 Boolean.TRUE,
                 createdAt);
 
-        var roleEntityUser = new RoleEntity(1, Role.ROLE_USER.name());
-        var roleEntityOwner = new RoleEntity(2, Role.ROLE_OWNER.name());
+        var roleEntityUser = new RoleEntity(1, RoleConstant.ROLE_USER.name());
+        var roleEntityOwner = new RoleEntity(2, RoleConstant.ROLE_OWNER.name());
         var userEntity = new UserEntity(
                 1L,
                 "Mock",
@@ -108,7 +108,7 @@ class ExchangeServiceTest {
                 .currencyRateEntity(currencyRateEntity)
                 .transactionAmount(transactionAmount)
                 .transactionPrice(currencyPurchasePrice)
-                .transactionType(TransactionType.SELL)
+                .transactionTypeConstant(TransactionTypeConstant.SELL)
                 .userDetails(userDetails)
                 .build();
 

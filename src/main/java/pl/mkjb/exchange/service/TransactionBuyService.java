@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
 
-import static pl.mkjb.exchange.util.TransactionType.BUY;
+import static pl.mkjb.exchange.util.TransactionTypeConstant.BUY;
 
 @Slf4j
 @Service
@@ -27,16 +27,6 @@ public class TransactionBuyService implements Transaction {
     private final UserService userService;
     private final ExchangeService exchangeService;
     private final TransactionRepository transactionRepository;
-
-    @Override
-    public boolean hasErrors(TransactionModel transactionModel, UserDetails userDetails) {
-        val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
-        val buyAmount = transactionModel.getTransactionAmount();
-
-        return buyAmount.compareTo(BigDecimal.ZERO) <= 0 ||
-                buyAmount.remainder(currencyRateEntity.getCurrencyEntity().getUnit()).compareTo(BigDecimal.ZERO) != 0 ||
-                buyAmount.compareTo(estimateMaxTransactionAmount(currencyRateEntity, userDetails)) > 0;
-    }
 
     @Override
     public TransactionModel getTransactionModel(UUID currencyRateId, UserDetails userDetails) {
@@ -51,10 +41,11 @@ public class TransactionBuyService implements Transaction {
                 .transactionPrice(currencyRateEntity.getSellPrice())
                 .userWalletAmount(userWalletAmountForBillingCurrency)
                 .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
                 .build();
     }
 
-    private BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
+    public BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
         val userWalletAmount = walletService.getUserWalletAmountForBillingCurrency(userDetails);
 
         val exchangeCurrencyAmount = calculateAvailableCurrency(currencyRateEntity.getCurrencyEntity().getId());
@@ -83,7 +74,7 @@ public class TransactionBuyService implements Transaction {
                 .transactionAmount(transactionModel.getTransactionAmount())
                 .transactionPrice(currencyRateEntity.getSellPrice())
                 .userDetails(userDetails)
-                .transactionType(BUY)
+                .transactionTypeConstant(BUY)
                 .build();
         val transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);
         exchangeService.saveTransaction(transactionEntities);

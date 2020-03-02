@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mkjb.exchange.model.UserModel;
 import pl.mkjb.exchange.service.UserService;
-import pl.mkjb.exchange.util.Message;
+import pl.mkjb.exchange.util.MessageConstant;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class UserRegisterController {
     private static final String VIEW_NAME = "user-registration";
     private static final String REDIRECT_URL = "redirect:/";
     private static final String MODEL_NAME = "userModel";
-    private static final String MESSAGE = Message.MESSAGE_SUCCESS.name();
+    private static final String MESSAGE = MessageConstant.MESSAGE_SUCCESS.name();
     private final UserService userService;
 
     @GetMapping

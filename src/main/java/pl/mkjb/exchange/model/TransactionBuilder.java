@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
-import pl.mkjb.exchange.util.TransactionType;
+import pl.mkjb.exchange.util.TransactionTypeConstant;
 
 import java.math.BigDecimal;
 
@@ -15,5 +15,5 @@ public class TransactionBuilder {
     private final BigDecimal transactionAmount;
     private final BigDecimal transactionPrice;
     private final UserDetails userDetails;
-    private final TransactionType transactionType;
+    private final TransactionTypeConstant transactionTypeConstant;
 }

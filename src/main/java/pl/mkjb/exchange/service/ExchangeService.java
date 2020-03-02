@@ -8,7 +8,7 @@ import pl.mkjb.exchange.entity.TransactionEntity;
 import pl.mkjb.exchange.entity.UserEntity;
 import pl.mkjb.exchange.model.TransactionBuilder;
 import pl.mkjb.exchange.repository.TransactionRepository;
-import pl.mkjb.exchange.util.TransactionType;
+import pl.mkjb.exchange.util.TransactionTypeConstant;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -35,28 +35,28 @@ public class ExchangeService {
                         currencyEntity,
                         userEntity,
                         transactionBuilder.getTransactionPrice(),
-                        transactionBuilder.getTransactionType().equals(TransactionType.BUY) ?
+                        transactionBuilder.getTransactionTypeConstant().equals(TransactionTypeConstant.BUY) ?
                                 transactionBuilder.getTransactionAmount() : transactionBuilder.getTransactionAmount().negate()),
 
                 prepareTransactionEntity().apply(
                         currencyEntity,
                         exchangeOwner,
                         transactionBuilder.getTransactionPrice(),
-                        transactionBuilder.getTransactionType().equals(TransactionType.BUY) ?
+                        transactionBuilder.getTransactionTypeConstant().equals(TransactionTypeConstant.BUY) ?
                                 transactionBuilder.getTransactionAmount().negate() : transactionBuilder.getTransactionAmount()),
 
                 prepareTransactionEntity().apply(
                         billingCurrencyEntity,
                         userEntity,
                         transactionBuilder.getTransactionPrice(),
-                        transactionBuilder.getTransactionType().equals(TransactionType.BUY) ?
+                        transactionBuilder.getTransactionTypeConstant().equals(TransactionTypeConstant.BUY) ?
                                 transactionBillingCurrencyAmount.negate() : transactionBillingCurrencyAmount),
 
                 prepareTransactionEntity().apply(
                         billingCurrencyEntity,
                         exchangeOwner,
                         transactionBuilder.getTransactionPrice(),
-                        transactionBuilder.getTransactionType().equals(TransactionType.BUY) ?
+                        transactionBuilder.getTransactionTypeConstant().equals(TransactionTypeConstant.BUY) ?
                                 transactionBillingCurrencyAmount : transactionBillingCurrencyAmount.negate()));
 
 

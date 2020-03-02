@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static java.math.RoundingMode.DOWN;
-import static pl.mkjb.exchange.util.TransactionType.SELL;
+import static pl.mkjb.exchange.util.TransactionTypeConstant.SELL;
 
 @Service
 @RequiredArgsConstructor
@@ -25,16 +25,6 @@ public class TransactionSellService implements Transaction {
     private final UserService userService;
     private final ExchangeService exchangeService;
     private final TransactionRepository transactionRepository;
-
-    @Override
-    public boolean hasErrors(TransactionModel transactionModel, UserDetails userDetails) {
-        val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
-        val buyAmount = transactionModel.getTransactionAmount();
-
-        return buyAmount.compareTo(BigDecimal.ZERO) <= 0 ||
-                buyAmount.remainder(currencyRateEntity.getCurrencyEntity().getUnit()).compareTo(BigDecimal.ZERO) != 0 ||
-                buyAmount.compareTo(estimateMaxTransactionAmount(currencyRateEntity, userDetails)) > 0;
-    }
 
     @Override
     public TransactionModel getTransactionModel(UUID currencyRateId, UserDetails userDetails) {
@@ -47,10 +37,11 @@ public class TransactionSellService implements Transaction {
                 .transactionPrice(currencyRateEntity.getPurchasePrice())
                 .userWalletAmount(walletService.getUserWalletAmountForGivenCurrency(currencyRateId, userDetails).setScale(0, DOWN))
                 .maxAllowedTransactionAmount(estimateMaxTransactionAmount(currencyRateEntity, userDetails).setScale(0, DOWN))
+                .transactionTypeConstant(SELL)
                 .build();
     }
 
-    private BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
+    public BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
         val billingCurrencyRateEntity = currencyService.findBillingCurrencyRate();
         val userWalletAmount = walletService.getUserWalletAmountForGivenCurrency(currencyRateEntity.getId(), userDetails);
         val exchangeCurrencyAmount = calculateAvailableCurrency(billingCurrencyRateEntity)
@@ -75,7 +66,7 @@ public class TransactionSellService implements Transaction {
                 .transactionAmount(transactionModel.getTransactionAmount())
                 .transactionPrice(currencyRateEntity.getPurchasePrice())
                 .userDetails(userDetails)
-                .transactionType(SELL)
+                .transactionTypeConstant(SELL)
                 .build();
         val transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);
         exchangeService.saveTransaction(transactionEntities);

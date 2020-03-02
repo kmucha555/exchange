@@ -15,15 +15,15 @@ import pl.mkjb.exchange.model.UserModel;
 import pl.mkjb.exchange.repository.RoleRepository;
 import pl.mkjb.exchange.repository.TransactionRepository;
 import pl.mkjb.exchange.repository.UserRepository;
-import pl.mkjb.exchange.util.Role;
+import pl.mkjb.exchange.util.RoleConstant;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static pl.mkjb.exchange.util.Role.ROLE_OWNER;
-import static pl.mkjb.exchange.util.Role.ROLE_USER;
+import static pl.mkjb.exchange.util.RoleConstant.ROLE_OWNER;
+import static pl.mkjb.exchange.util.RoleConstant.ROLE_USER;
 
 @Slf4j
 @Service
@@ -79,11 +79,11 @@ public class UserService {
                 });
     }
 
-    private RoleEntity findRoleByName(Role role) {
-        return roleRepository.findByRole(role.name())
+    private RoleEntity findRoleByName(RoleConstant roleConstant) {
+        return roleRepository.findByRole(roleConstant.name())
                 .getOrElseThrow(() -> {
                     log.error("User with ROLE_OWNER not found");
-                    throw new BadResourceException("User with {} not found" + role);
+                    throw new BadResourceException("User with {} not found" + roleConstant);
                 });
     }
 

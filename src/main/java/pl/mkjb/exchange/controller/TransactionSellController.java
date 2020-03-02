@@ -1,7 +1,6 @@
 package pl.mkjb.exchange.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,25 +13,25 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mkjb.exchange.model.TransactionModel;
 import pl.mkjb.exchange.security.CustomUser;
 import pl.mkjb.exchange.service.CurrencyService;
-import pl.mkjb.exchange.service.Transaction;
+import pl.mkjb.exchange.service.TransactionFacadeService;
 import pl.mkjb.exchange.service.WalletService;
-import pl.mkjb.exchange.util.Message;
+import pl.mkjb.exchange.util.MessageConstant;
 
 import javax.validation.Valid;
 import java.util.UUID;
+
+import static pl.mkjb.exchange.util.TransactionTypeConstant.SELL;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/transaction")
 public class TransactionSellController {
-    @Value("${pl.mkjb.exchange.controller.WrongAmount.message}")
-    private String wrongAmount;
-    private static final String MESSAGE_SUCCESS = Message.MESSAGE_SUCCESS.name();
-    private static final String MESSAGE_FAILED = Message.MESSAGE_FAILED.name();
+    private static final String MESSAGE_SUCCESS = MessageConstant.MESSAGE_SUCCESS.name();
+    private static final String MESSAGE_FAILED = MessageConstant.MESSAGE_FAILED.name();
     private static final String VIEW_NAME = "sell";
     private static final String MODEL_NAME = "transactionModel";
     private static final String REDIRECT_URL = "redirect:/dashboard";
-    private final Transaction transactionSellService;
+    private final TransactionFacadeService transactionFacadeService;
     private final CurrencyService currencyService;
     private final WalletService walletService;
 
@@ -52,7 +51,11 @@ public class TransactionSellController {
             return REDIRECT_URL;
         }
 
-        model.addAttribute(MODEL_NAME, transactionSellService.getTransactionModel(currencyRateId, customUser));
+        model.addAttribute(MODEL_NAME,
+                transactionFacadeService.getTransactionModel()
+                        .apply(SELL)
+                        .apply(currencyRateId, customUser));
+
         return VIEW_NAME;
     }
 
@@ -71,15 +74,12 @@ public class TransactionSellController {
             return REDIRECT_URL;
         }
 
-        if (transactionSellService.hasErrors(transactionModel, customUser)) {
-            bindingResult.rejectValue("transactionAmount", "error.user", wrongAmount);
-            return VIEW_NAME;
-        }
+        transactionFacadeService.saveTransaction()
+                .apply(SELL)
+                .accept(transactionModel, customUser);
 
-        transactionSellService.saveTransaction(transactionModel, customUser);
         redirectAttributes.addFlashAttribute(MESSAGE_SUCCESS,
                 String.format("Success! You sold %s %s", transactionModel.getTransactionAmount(), transactionModel.getCurrencyCode()));
-
         return REDIRECT_URL;
     }
 }

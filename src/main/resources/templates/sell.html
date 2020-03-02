@@ -18,10 +18,6 @@
                              th:errors="*{transactionAmount}"></div>
                         <div class="form-group mt-3">
                             <input class="form-control form-control-lg" th:type="number" th:field="*{transactionAmount}"
-                                   th:min="*{currencyUnit}"
-                                   th:max="*{maxAllowedTransactionAmount}"
-                                   th:step="*{currencyUnit}"
-                                   th:placeholder="'Enter ' + *{currencyCode} + ' amount'"/>
                         </div>
                         <h4 th:text="'Your Currency rate: ' + *{currencyUnit} + ' ' +
                          *{currencyCode} + ' = ' + *{transactionPrice} + ' PLN'"></h4>
@@ -31,13 +27,13 @@
                         <div class="form-group text-center pt-5">
                             <input class="btn btn-lg btn-block btn-danger" type="submit" value="Sell"/>
                         </div>
-                        <input th:type="hidden" th:field="*{currencyRateId}" th:value="*{currencyRateId}">
-                        <input th:type="hidden" th:field="*{currencyUnit}" th:value="*{currencyUnit}">
-                        <input th:type="hidden" th:field="*{currencyCode}" th:value="*{currencyCode}">
-                        <input th:type="hidden" th:field="*{userWalletAmount}" th:value="*{userWalletAmount}">
-                        <input th:type="hidden" th:field="*{maxAllowedTransactionAmount}"
-                               th:value="*{maxAllowedTransactionAmount}">
-                        <input th:type="hidden" th:field="*{transactionPrice}" th:value="*{transactionPrice}">
+                        <input th:type="hidden" th:field="*{currencyRateId}">
+                        <input th:type="hidden" th:field="*{currencyUnit}">
+                        <input th:type="hidden" th:field="*{currencyCode}">
+                        <input th:type="hidden" th:field="*{userWalletAmount}">
+                        <input th:type="hidden" th:field="*{maxAllowedTransactionAmount}">
+                        <input th:type="hidden" th:field="*{transactionPrice}">
+                        <input th:type="hidden" th:field="*{transactionTypeConstant}">
                     </form>
                 </div>
             </div>

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pl.mkjb.exchange.model.CurrencyRatesModel;
-import pl.mkjb.exchange.model.WalletModel;
+import pl.mkjb.exchange.model.UserWalletModel;
 import pl.mkjb.exchange.restclient.RestClient;
 import pl.mkjb.exchange.security.CustomUser;
 import pl.mkjb.exchange.service.CurrencyService;
@@ -37,7 +37,7 @@ public class DashboardController {
 
     @ResponseBody
     @GetMapping("/wallet")
-    public ResponseEntity<Set<WalletModel>> getUserWallet(@AuthenticationPrincipal CustomUser customUser) {
+    public ResponseEntity<Set<UserWalletModel>> getUserWallet(@AuthenticationPrincipal CustomUser customUser) {
         if (futureProcessingRestClient.isConnectionAlive()) {
             val userWallet = walletService.getUserWallet(customUser);
             return ResponseEntity.status(HttpStatus.OK).body(userWallet);

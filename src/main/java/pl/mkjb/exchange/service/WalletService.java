@@ -9,7 +9,7 @@ import pl.mkjb.exchange.entity.CurrencyEntity;
 import pl.mkjb.exchange.exception.BadResourceException;
 import pl.mkjb.exchange.model.CurrencyModel;
 import pl.mkjb.exchange.model.CurrencyRatesModel;
-import pl.mkjb.exchange.model.WalletModel;
+import pl.mkjb.exchange.model.UserWalletModel;
 import pl.mkjb.exchange.repository.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -24,21 +24,21 @@ public class WalletService {
     private final CurrencyService currencyService;
     private final TransactionRepository transactionRepository;
 
-    public Set<WalletModel> getUserWallet(UserDetails userDetails) {
-        val userWallet = transactionRepository.findUserWallet(userDetails.getUsername());
+    public Set<UserWalletModel> getUserWallet(UserDetails userDetails) {
+        final Set<UserWalletModel> userWallet = transactionRepository.findUserWallet(userDetails.getUsername());
         return addNewestCurrencyRatesToUserWallet(userWallet);
     }
 
-    private Set<WalletModel> addNewestCurrencyRatesToUserWallet(Set<WalletModel> userWallet) {
+    private Set<UserWalletModel> addNewestCurrencyRatesToUserWallet(Set<UserWalletModel> userWallet) {
         val baseCurrencyRateEntity = currencyService.findBillingCurrencyRate();
         final CurrencyRatesModel currencyRatesModel = currencyService.getNewestRates();
         return userWallet.stream()
-                .filter(walletModel -> !walletModel.getCode().equals(baseCurrencyRateEntity.getCurrencyEntity().getCode()))
-                .map(walletModel -> {
-                    val walletCurrency = getCurrencyModelForWalletCurrency(currencyRatesModel, walletModel);
-                    return WalletModel.builder()
-                            .amount(walletModel.getAmount())
-                            .code(walletModel.getCode())
+                .filter(userWalletModel -> !userWalletModel.getCode().equals(baseCurrencyRateEntity.getCurrencyEntity().getCode()))
+                .map(userWalletModel -> {
+                    val walletCurrency = getCurrencyModelForWalletCurrency(currencyRatesModel, userWalletModel);
+                    return UserWalletModel.builder()
+                            .amount(userWalletModel.getAmount())
+                            .code(userWalletModel.getCode())
                             .unit(walletCurrency.getUnit())
                             .currencyRateId(walletCurrency.getCurrencyRateId())
                             .purchasePrice(walletCurrency.getPurchasePrice())
@@ -47,12 +47,12 @@ public class WalletService {
                 .collect(Collectors.toUnmodifiableSet());
     }
 
-    private CurrencyModel getCurrencyModelForWalletCurrency(CurrencyRatesModel currencyRatesModel, WalletModel walletModel) {
+    private CurrencyModel getCurrencyModelForWalletCurrency(CurrencyRatesModel currencyRatesModel, UserWalletModel userWalletModel) {
         return currencyRatesModel.getItems()
                 .stream()
-                .filter(currencyModel -> currencyModel.getCode().equals(walletModel.getCode()))
+                .filter(currencyModel -> currencyModel.getCode().equals(userWalletModel.getCode()))
                 .findFirst()
-                .orElseThrow(() -> new BadResourceException("There's no currency with given code " + walletModel.getCode()));
+                .orElseThrow(() -> new BadResourceException("There's no currency with given code " + userWalletModel.getCode()));
     }
 
     public BigDecimal getUserWalletAmountForGivenCurrency(UUID currencyId, UserDetails userDetails) {
@@ -71,8 +71,8 @@ public class WalletService {
     private BigDecimal getCurrencyAmount(UserDetails userDetails, CurrencyEntity currencyRateEntity) {
         return transactionRepository.findUserWallet(userDetails.getUsername())
                 .stream()
-                .filter(walletModel -> walletModel.getCode().equals(currencyRateEntity.getCode()))
-                .map(WalletModel::getAmount)
+                .filter(userWalletModel -> userWalletModel.getCode().equals(currencyRateEntity.getCode()))
+                .map(UserWalletModel::getAmount)
                 .findAny()
                 .orElse(BigDecimal.ZERO);
     }

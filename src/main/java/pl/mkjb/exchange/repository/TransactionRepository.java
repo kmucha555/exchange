@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import pl.mkjb.exchange.entity.TransactionEntity;
-import pl.mkjb.exchange.model.WalletModel;
+import pl.mkjb.exchange.model.UserWalletModel;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -15,12 +15,12 @@ import java.util.Set;
 public interface TransactionRepository extends CrudRepository<TransactionEntity, Long> {
 
     @Query("select " +
-            "new pl.mkjb.exchange.model.WalletModel(" +
+            "new pl.mkjb.exchange.model.UserWalletModel(" +
             "t.currencyEntity.code, " +
             "sum(t.amount)) " +
             "from TransactionEntity t where t.userEntity.username = :username " +
             "group by t.currencyEntity.id")
-    Set<WalletModel> findUserWallet(@Param("username") String username);
+    Set<UserWalletModel> findUserWallet(@Param("username") String username);
 
     @Query("select sum(t.amount) from TransactionEntity t where t.userEntity.id = :userId and t.currencyEntity.id = :currencyId")
     Option<BigDecimal> sumCurrencyAmountForUser(@Param("userId") Long userId, @Param("currencyId") Integer currencyId);
