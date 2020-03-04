@@ -12,10 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ExceptionHandlingController {
 
-    @ExceptionHandler({BadResourceException.class, IllegalArgumentException.class,
-            UsernameNotFoundException.class})
-    public String handleException(HttpServletRequest request, RuntimeException exception) {
+    @ExceptionHandler({BadResourceException.class, UsernameNotFoundException.class})
+    public String handle4xxException(HttpServletRequest request, RuntimeException exception) {
         log.error("Request: {} raised exception. Message: {}", request.getRequestURL(), exception.getMessage());
         return "errors/404";
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, NullPointerException.class})
+    public String handle5xxException(HttpServletRequest request, RuntimeException exception) {
+        log.error("Request: {} raised exception. Message: {}", request.getRequestURL(), exception.getMessage());
+        return "errors/500";
     }
 }
