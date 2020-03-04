@@ -1,173 +1,204 @@
-//package pl.mkjb.exchange.service;
-//
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.Mockito;
-//import pl.mkjb.exchange.entity.CurrencyEntity;
-//import pl.mkjb.exchange.entity.CurrencyRateEntity;
-//import pl.mkjb.exchange.model.CurrencyModel;
-//import pl.mkjb.exchange.model.CurrencyRatesModel;
-//import pl.mkjb.exchange.model.WalletModel;
-//import pl.mkjb.exchange.repository.TransactionRepository;
-//
-//import java.math.BigDecimal;
-//import java.time.LocalDateTime;
-//import java.util.Set;
-//import java.util.UUID;
-//
-//import static org.hamcrest.MatcherAssert.assertThat;
-//import static org.hamcrest.core.IsEqual.equalTo;
-//import static org.mockito.Mockito.when;
-//
-//class WalletServiceTest {
-//    private CurrencyService currencyServiceMock = Mockito.mock(CurrencyService.class);
-//    private TransactionRepository transactionRepositoryMock = Mockito.mock(TransactionRepository.class);
-//    private WalletService walletService = new WalletService(currencyServiceMock, transactionRepositoryMock);
-//    private CurrencyEntity currencyEntity;
-//    private CurrencyEntity billingCurrencyEntity;
-//    private CurrencyRateEntity currencyRateEntity;
-//    private CurrencyRateEntity billingCurrencyRateEntity;
-//    private UUID currencyRateId;
-//    private UUID billingCurrencyRateId;
-//    private BigDecimal currencySellPrice;
-//    private BigDecimal currencyPurchasePrice;
-//    private BigDecimal currencyAveragePrice;
-//    private BigDecimal billingCurrencyPurchasePrice;
-//    private String username;
-//    private LocalDateTime publicationDate;
-//    private LocalDateTime createdAt;
-//
-//    @BeforeEach
-//    void init() {
-//        username = "test-user";
-//        currencyRateId = UUID.randomUUID();
-//        billingCurrencyRateId = UUID.randomUUID();
-//        publicationDate = LocalDateTime.of(2020, 2, 26, 17, 20, 5);
-//        createdAt = LocalDateTime.of(2020, 2, 26, 17, 20, 20);
-//        currencyEntity = new CurrencyEntity(1, "US Dollar", "USD", BigDecimal.ONE, false);
-//        billingCurrencyEntity = new CurrencyEntity(2, "Polish zloty", "PLN", BigDecimal.ONE, true);
-//        currencySellPrice = BigDecimal.valueOf(3.7392);
-//        currencyPurchasePrice = BigDecimal.valueOf(3.7222);
-//        currencyAveragePrice = BigDecimal.valueOf(3.7300);
-//        billingCurrencyPurchasePrice = BigDecimal.ONE;
-//
-//        currencyRateEntity =
-//                new CurrencyRateEntity(
-//                        currencyRateId,
-//                        currencyEntity,
-//                        currencyPurchasePrice,
-//                        currencySellPrice,
-//                        currencyAveragePrice,
-//                        publicationDate,
-//                        Boolean.TRUE,
-//                        createdAt);
-//
-//        billingCurrencyRateEntity =
-//                new CurrencyRateEntity(
-//                        billingCurrencyRateId,
-//                        billingCurrencyEntity,
-//                        BigDecimal.ONE,
-//                        BigDecimal.ONE,
-//                        BigDecimal.ONE,
-//                        publicationDate,
-//                        Boolean.TRUE,
-//                        createdAt);
-//    }
-//
-//
-//    @Test
-//    void givenZeroInUserWalletForBillingCurrency_whenTestingUserHasInsufficientFunds_thenReturnTrue() {
-//        //given
-//        var userWalletCurrencyAmount = BigDecimal.ZERO;
-//        var userWallet = Set.of(new WalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, BigDecimal.ONE));
-//        when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
-//        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
-//        when(transactionRepositoryMock.findUserWallet(username)).thenReturn(userWallet);
-//
-//        //when
-//        boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, username);
-//
-//        //then
-//        assertThat(test, equalTo(true));
-//    }
-//
-//    @Test
-//    void givenGreaterThanZeroInUserWalletForBillingCurrency_whenTestingUserHasInsufficientFunds_thenReturnFalse() {
-//        //given
-//        var userWalletCurrencyAmount = BigDecimal.TEN;
-//        var userWallet = Set.of(new WalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, billingCurrencyPurchasePrice));
-//        when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
-//        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
-//        when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
-//
-//        //when
-//        boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, userId);
-//
-//        //then
-//        assertThat(test, equalTo(false));
-//    }
-//
-//    @Test
-//    void givenGreaterThanZeroAmountInUserWalletForBillingCurrency_whenGetWalletAmountForBillingCurrency_thenReturnInputAmount() {
-//        //given
-//        var userWalletCurrencyAmount = BigDecimal.TEN;
-//        var userWallet = Set.of(new WalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, billingCurrencyPurchasePrice));
-//        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
-//        when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
-//
-//        //when
-//        BigDecimal test = walletService.getUserWalletAmountForBillingCurrency(userId);
-//
-//        //then
-//        assertThat(test, equalTo(BigDecimal.TEN));
-//    }
-//
-//    @Test
-//    void givenGreaterThanZeroAmountInUserWalletForCurrency_whenGetWalletAmountForCurrency_thenReturnInputAmount() {
-//        //given
-//        var userWalletCurrencyAmount = BigDecimal.TEN;
-//        var userWallet = Set.of(new WalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmount, currencyPurchasePrice));
-//        when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
-//        when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
-//
-//        //when
-//        BigDecimal test = walletService.getUserWalletAmountForGivenCurrency(currencyRateId, userId);
-//
-//        //then
-//        assertThat(test, equalTo(BigDecimal.TEN));
-//    }
-//
-//    @Test
-//    void givenMockedUserWallet_whenGetUserWalletIsCalled_thenReturnUserWallet() {
-//        //given
-//        var userWalletCurrencyAmountUSD = BigDecimal.valueOf(1000);
-//
-//        var currencyRateEntityCZK =
-//                new CurrencyRateEntity(
-//                        currencyRateId,
-//                        currencyEntity,
-//                        currencyPurchasePrice,
-//                        currencySellPrice,
-//                        currencyAveragePrice,
-//                        publicationDate,
-//                        Boolean.TRUE,
-//                        createdAt);
-//
-//        var currencyModels = Set.of(
-//                CurrencyModel.buildCurrencyModel(currencyRateEntityCZK));
-//        var currencyRatesModel = CurrencyRatesModel.of(publicationDate, currencyModels);
-//        var userWallet = Set.of(
-//                new WalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmountUSD, currencyPurchasePrice)
-//        );
-//
-//        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
-//        when(currencyServiceMock.getNewestRates()).thenReturn(currencyRatesModel);
-//        when(transactionRepositoryMock.findUserWallet(userId)).thenReturn(userWallet);
-//
-//        //when
-//        Set<WalletModel> test = walletService.getUserWallet(userId);
-//
-//        //then
-//        assertThat(test, equalTo(userWallet));
-//    }
-//}
+package pl.mkjb.exchange.service;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.security.core.userdetails.UserDetails;
+import pl.mkjb.exchange.entity.CurrencyEntity;
+import pl.mkjb.exchange.entity.CurrencyRateEntity;
+import pl.mkjb.exchange.model.CurrencyModel;
+import pl.mkjb.exchange.model.CurrencyRatesModel;
+import pl.mkjb.exchange.model.UserWalletModel;
+import pl.mkjb.exchange.repository.TransactionRepository;
+import pl.mkjb.exchange.security.CustomUser;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.mockito.Mockito.when;
+
+class WalletServiceTest {
+    private CurrencyService currencyServiceMock = Mockito.mock(CurrencyService.class);
+    private TransactionRepository transactionRepositoryMock = Mockito.mock(TransactionRepository.class);
+    private WalletService walletService = new WalletService(currencyServiceMock, transactionRepositoryMock);
+    private CurrencyEntity currencyEntity;
+    private CurrencyEntity billingCurrencyEntity;
+    private CurrencyRateEntity currencyRateEntity;
+    private CurrencyRateEntity billingCurrencyRateEntity;
+    private UserDetails userDetails;
+    private UUID currencyRateId;
+    private UUID billingCurrencyRateId;
+    private BigDecimal currencySellPrice;
+    private BigDecimal currencyPurchasePrice;
+    private BigDecimal currencyAveragePrice;
+    private BigDecimal billingCurrencyPurchasePrice;
+    private String username;
+    private LocalDateTime publicationDate;
+    private LocalDateTime createdAt;
+
+    @BeforeEach
+    void init() {
+        username = "test-user";
+        currencyRateId = UUID.randomUUID();
+        billingCurrencyRateId = UUID.randomUUID();
+        publicationDate = LocalDateTime.of(2020, 2, 26, 17, 20, 5);
+        createdAt = LocalDateTime.of(2020, 2, 26, 17, 20, 20);
+        currencySellPrice = BigDecimal.valueOf(3.7392);
+        currencyPurchasePrice = BigDecimal.valueOf(3.7222);
+        currencyAveragePrice = BigDecimal.valueOf(3.7300);
+        billingCurrencyPurchasePrice = BigDecimal.ONE;
+
+        currencyEntity = CurrencyEntity.builder()
+                .id(1)
+                .name("US Dollar")
+                .code("USD")
+                .unit(BigDecimal.ONE)
+                .billingCurrency(false)
+                .build();
+
+        billingCurrencyEntity = CurrencyEntity.builder()
+                .id(1)
+                .name("Polish zloty")
+                .code("PLN")
+                .unit(BigDecimal.ONE)
+                .billingCurrency(true)
+                .build();
+
+        currencyRateEntity = CurrencyRateEntity.builder()
+                .id(currencyRateId)
+                .currencyEntity(currencyEntity)
+                .purchasePrice(currencyPurchasePrice)
+                .sellPrice(currencySellPrice)
+                .averagePrice(currencyAveragePrice)
+                .publicationDate(publicationDate)
+                .active(Boolean.TRUE)
+                .createdAt(createdAt)
+                .build();
+
+        billingCurrencyRateEntity = CurrencyRateEntity.builder()
+                .id(billingCurrencyRateId)
+                .currencyEntity(billingCurrencyEntity)
+                .purchasePrice(BigDecimal.ONE)
+                .sellPrice(BigDecimal.ONE)
+                .averagePrice(BigDecimal.ONE)
+                .publicationDate(publicationDate)
+                .active(Boolean.TRUE)
+                .createdAt(createdAt)
+                .build();
+
+        userDetails = CustomUser.buildCustomUser()
+                .id(1L)
+                .username("test-user")
+                .fullName("Test User")
+                .password("Password")
+                .enabled(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .accountNonExpired(true)
+                .authorities(Set.of())
+                .build();
+    }
+
+    @Test
+    void givenZeroInUserWalletForBillingCurrency_whenTestingUserHasInsufficientFunds_thenReturnTrue() {
+        //given
+        var userWalletCurrencyAmount = BigDecimal.ZERO;
+        var userWallet = Set.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, BigDecimal.ONE));
+        when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
+        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
+        when(transactionRepositoryMock.findUserWallet(username)).thenReturn(userWallet);
+
+        //when
+        boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, userDetails);
+
+        //then
+        assertThat(test, equalTo(true));
+    }
+
+    @Test
+    void givenGreaterThanZeroInUserWalletForBillingCurrency_whenTestingUserHasInsufficientFunds_thenReturnFalse() {
+        //given
+        var userWalletCurrencyAmount = BigDecimal.TEN;
+        var userWallet = Set.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, billingCurrencyPurchasePrice));
+        when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
+        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
+        when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
+
+        //when
+        boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, userDetails);
+
+        //then
+        assertThat(test, equalTo(false));
+    }
+
+    @Test
+    void givenGreaterThanZeroAmountInUserWalletForBillingCurrency_whenGetWalletAmountForBillingCurrency_thenReturnInputAmount() {
+        //given
+        var userWalletCurrencyAmount = BigDecimal.TEN;
+        var userWallet = Set.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, billingCurrencyPurchasePrice));
+        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
+        when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
+
+        //when
+        BigDecimal test = walletService.getUserWalletAmountForBillingCurrency(userDetails);
+
+        //then
+        assertThat(test, equalTo(BigDecimal.TEN));
+    }
+
+    @Test
+    void givenGreaterThanZeroAmountInUserWalletForCurrency_whenGetWalletAmountForCurrency_thenReturnInputAmount() {
+        //given
+        var userWalletCurrencyAmount = BigDecimal.TEN;
+        var userWallet = Set.of(new UserWalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmount, currencyPurchasePrice));
+        when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
+        when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
+
+        //when
+        BigDecimal test = walletService.getUserWalletAmountForGivenCurrency(currencyRateId, userDetails);
+
+        //then
+        assertThat(test, equalTo(BigDecimal.TEN));
+    }
+
+    @Test
+    void givenMockedUserWallet_whenGetUserWalletIsCalled_thenReturnUserWallet() {
+        //given
+        var userWalletCurrencyAmountUSD = BigDecimal.valueOf(1000);
+
+        var currencyRateEntityCZK = CurrencyRateEntity.builder()
+                .id(currencyRateId)
+                .currencyEntity(currencyEntity)
+                .purchasePrice(currencyPurchasePrice)
+                .sellPrice(currencySellPrice)
+                .averagePrice(currencyAveragePrice)
+                .publicationDate(publicationDate)
+                .active(Boolean.TRUE)
+                .createdAt(createdAt)
+                .build();
+
+        var currencyModels = Set.of(
+                CurrencyModel.buildCurrencyModel(currencyRateEntityCZK)
+        );
+
+        var currencyRatesModel = CurrencyRatesModel.of(publicationDate, currencyModels);
+
+        var userWallet = Set.of(
+                new UserWalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmountUSD, currencyPurchasePrice)
+        );
+
+        when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
+        when(currencyServiceMock.getNewestRates()).thenReturn(currencyRatesModel);
+        when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
+
+        //when
+        Set<UserWalletModel> test = walletService.getUserWallet(userDetails);
+
+        //then
+        assertThat(test, equalTo(userWallet));
+    }
+}
