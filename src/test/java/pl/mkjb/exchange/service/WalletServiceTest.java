@@ -36,13 +36,11 @@ class WalletServiceTest {
     private BigDecimal currencyPurchasePrice;
     private BigDecimal currencyAveragePrice;
     private BigDecimal billingCurrencyPurchasePrice;
-    private String username;
     private LocalDateTime publicationDate;
     private LocalDateTime createdAt;
 
     @BeforeEach
     void init() {
-        username = "test-user";
         currencyRateId = UUID.randomUUID();
         billingCurrencyRateId = UUID.randomUUID();
         publicationDate = LocalDateTime.of(2020, 2, 26, 17, 20, 5);
@@ -110,7 +108,7 @@ class WalletServiceTest {
         var userWallet = Set.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, BigDecimal.ONE));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
-        when(transactionRepositoryMock.findUserWallet(username)).thenReturn(userWallet);
+        when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
 
         //when
         boolean test = walletService.hasInsufficientFundsForBuyCurrency(currencyRateId, userDetails);
