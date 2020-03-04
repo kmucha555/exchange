@@ -32,7 +32,7 @@ public class UserRegisterController {
     @GetMapping
     public ModelAndView show() {
         return new ModelAndView(VIEW_NAME,
-                Map.of(MODEL_NAME, UserModel.of()));
+                Map.of(MODEL_NAME, UserModel.builder().build()));
     }
 
     @PostMapping

@@ -1,9 +1,9 @@
 package pl.mkjb.exchange.model;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import pl.mkjb.exchange.util.TransactionTypeConstant;
 import pl.mkjb.exchange.validator.TransactionAmount;
 import pl.mkjb.exchange.validator.TransactionType;
@@ -12,23 +12,26 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@JsonDeserialize(builder = TransactionModel.TransactionModelBuilder.class)
+@Builder(builderClassName = "TransactionModelBuilder", toBuilder = true)
 @Data
 @TransactionAmount(transactionAmountFieldName = "transactionAmount")
 public class TransactionModel {
-    private UUID currencyRateId;
-    private String currencyCode;
-    private BigDecimal currencyUnit;
-    private BigDecimal transactionPrice;
-    private BigDecimal userWalletAmount;
+    private final UUID currencyRateId;
+    private final String currencyCode;
+    private final BigDecimal currencyUnit;
+    private final BigDecimal transactionPrice;
+    private final BigDecimal userWalletAmount;
 
     @NotNull
-    private BigDecimal transactionAmount;
+    private final BigDecimal transactionAmount;
 
-    private BigDecimal maxAllowedTransactionAmount;
+    private final BigDecimal maxAllowedTransactionAmount;
 
     @TransactionType
-    private TransactionTypeConstant transactionTypeConstant;
+    private final TransactionTypeConstant transactionTypeConstant;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class TransactionModelBuilder {
+    }
 }

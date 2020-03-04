@@ -29,8 +29,8 @@ public class CurrencyRateFetchService {
                 .filter(this::hasNewCurrencyRatesBundleBeenPublished)
                 .peek(currenciesRates -> currencyRateRepository.archiveCurrencyRates())
                 .map(this::buildCurrenciesRatesEntities)
-                .map(currencyRateRepository::saveAll)
                 .peek(currenciesRates -> log.info("New exchange rates available. Saving to database: {}", currenciesRates))
+                .map(currencyRateRepository::saveAll)
                 .onEmpty(() -> log.info("No new exchange rates has been published"));
     }
 
@@ -41,13 +41,14 @@ public class CurrencyRateFetchService {
     private Set<CurrencyRateEntity> buildCurrenciesRatesEntities(CurrencyRatesModel currenciesRates) {
         return currenciesRates.getItems()
                 .stream()
-                .map(currencyModel -> CurrencyRateEntity.builder()
-                        .currencyEntity(getCurrencyEntity(currencyModel))
-                        .averagePrice(currencyModel.getAveragePrice())
-                        .purchasePrice(currencyModel.getPurchasePrice())
-                        .sellPrice(currencyModel.getSellPrice())
-                        .publicationDate(currenciesRates.getPublicationDate())
-                        .build())
+                .map(currencyModel ->
+                        CurrencyRateEntity.builder()
+                                .currencyEntity(getCurrencyEntity(currencyModel))
+                                .averagePrice(currencyModel.getAveragePrice())
+                                .purchasePrice(currencyModel.getPurchasePrice())
+                                .sellPrice(currencyModel.getSellPrice())
+                                .publicationDate(currenciesRates.getPublicationDate())
+                                .build())
                 .collect(Collectors.toUnmodifiableSet());
     }
 

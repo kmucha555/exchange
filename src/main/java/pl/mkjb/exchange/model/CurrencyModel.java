@@ -1,28 +1,31 @@
 package pl.mkjb.exchange.model;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@JsonDeserialize(builder = CurrencyModel.CurrencyModelBuilder.class)
+@Builder(builderClassName = "CurrencyModelBuilder", toBuilder = true)
 @Data
 public class CurrencyModel {
-    private UUID currencyRateId;
-    private int currencyId;
-    private String name;
-    private String code;
-    private BigDecimal unit;
-    private BigDecimal purchasePrice;
-    private BigDecimal sellPrice;
-    private BigDecimal averagePrice;
-    private boolean billingCurrency;
+    private final UUID currencyRateId;
+    private final int currencyId;
+    private final String name;
+    private final String code;
+    private final BigDecimal unit;
+    private final BigDecimal purchasePrice;
+    private final BigDecimal sellPrice;
+    private final BigDecimal averagePrice;
+    private final boolean billingCurrency;
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class CurrencyModelBuilder {
+    }
 
     public static CurrencyModel buildCurrencyModel(CurrencyRateEntity currencyRate) {
         return CurrencyModel.builder()
