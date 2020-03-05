@@ -69,12 +69,13 @@ public class TransactionBuyService implements Transaction {
     @Override
     @Transactional
     public void saveTransaction(TransactionModel transactionModel, UserDetails userDetails) {
+        val userEntity = userService.findByUsername(userDetails.getUsername());
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
         val transactionBuilder = TransactionBuilder.builder()
                 .currencyRateEntity(currencyRateEntity)
-                .transactionAmount(transactionModel.getTransactionAmount())
+                .transactionAmount(transactionModel.getTransactionAmount().negate())
                 .transactionPrice(currencyRateEntity.getSellPrice())
-                .userDetails(userDetails)
+                .userEntity(userEntity)
                 .transactionTypeConstant(BUY)
                 .build();
         final Set<TransactionEntity> transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);

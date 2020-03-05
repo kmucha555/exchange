@@ -1,24 +1,21 @@
 package pl.mkjb.exchange.service;
 
-import io.vavr.Function1;
 import io.vavr.Function2;
-import io.vavr.Function4;
-import io.vavr.control.Option;
+import io.vavr.collection.HashSet;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.stereotype.Service;
 import pl.mkjb.exchange.entity.CurrencyEntity;
 import pl.mkjb.exchange.entity.TransactionEntity;
 import pl.mkjb.exchange.entity.UserEntity;
 import pl.mkjb.exchange.model.TransactionBuilder;
 import pl.mkjb.exchange.repository.TransactionRepository;
-import pl.mkjb.exchange.util.TransactionTypeConstant;
+import pl.mkjb.exchange.util.RoleConstant;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
 import static java.math.RoundingMode.HALF_UP;
-import static pl.mkjb.exchange.util.TransactionTypeConstant.BUY;
-import static pl.mkjb.exchange.util.TransactionTypeConstant.SELL;
 
 @Service
 @RequiredArgsConstructor
@@ -28,70 +25,58 @@ public class ExchangeService {
     private final CurrencyService currencyService;
 
     public Set<TransactionEntity> prepareTransactionToSave(TransactionBuilder transactionBuilder) {
-        final CurrencyEntity billingCurrencyEntity = currencyService.findBillingCurrencyRate().getCurrencyEntity();
-        final CurrencyEntity currencyEntity = currencyService.findCurrencyById(transactionBuilder.getCurrencyRateEntity().getCurrencyEntity().getId());
         final UserEntity exchangeOwnerEntity = userService.findOwner();
-        final UserEntity userEntity = userService.findByUsername(transactionBuilder.getUserDetails().getUsername());
-
+        final UserEntity userEntity = transactionBuilder.getUserEntity();
         return Set.of(
-                prepareTransactionEntity().apply(
-                        currencyEntity,
-                        userEntity,
-                        transactionBuilder.getTransactionPrice(),
-                        calculateCurrencyAmount().apply(SELL, transactionBuilder)),
-
-                prepareTransactionEntity().apply(
-                        currencyEntity,
-                        exchangeOwnerEntity,
-                        transactionBuilder.getTransactionPrice(),
-                        calculateCurrencyAmount().apply(BUY, transactionBuilder)),
-
-                prepareTransactionEntity().apply(
-                        billingCurrencyEntity,
-                        userEntity,
-                        transactionBuilder.getTransactionPrice(),
-                        calculateBillingCurrencyAmount().apply(SELL).apply(transactionBuilder, currencyEntity)),
-
-                prepareTransactionEntity().apply(
-                        billingCurrencyEntity,
-                        exchangeOwnerEntity,
-                        transactionBuilder.getTransactionPrice(),
-                        calculateBillingCurrencyAmount().apply(BUY).apply(transactionBuilder, currencyEntity))
+                prepareTransactionForTransactionCurrency().apply(userEntity, transactionBuilder),
+                prepareTransactionForBillingCurrency().apply(userEntity, transactionBuilder),
+                prepareTransactionForTransactionCurrency().apply(exchangeOwnerEntity, transactionBuilder),
+                prepareTransactionForBillingCurrency().apply(exchangeOwnerEntity, transactionBuilder)
         );
     }
 
-    private Function2<TransactionTypeConstant, TransactionBuilder, BigDecimal> calculateCurrencyAmount() {
-        return (transactionType, transaction) -> Option.of(transactionType)
-                .filter(type -> type.equals(BUY))
-                .map(type -> transaction.getTransactionAmount())
-                .getOrElse(() -> transaction.getTransactionAmount().negate());
-    }
-
-    private Function1<TransactionTypeConstant, Function2<TransactionBuilder, CurrencyEntity, BigDecimal>> calculateBillingCurrencyAmount() {
-        return transactionType -> Option.of(transactionType)
-                .filter(type -> type.equals(BUY))
-                .map(type -> decreaseBalance())
-                .getOrElse(this::increaseBalance);
-    }
-
-    private Function2<TransactionBuilder, CurrencyEntity, BigDecimal> increaseBalance() {
-        return (transaction, currency) -> transaction.getTransactionAmount()
-                .multiply(transaction.getTransactionPrice())
-                .divide(currency.getUnit(), HALF_UP);
-    }
-
-    private Function2<TransactionBuilder, CurrencyEntity, BigDecimal> decreaseBalance() {
-        return (transaction, currency) -> increaseBalance().apply(transaction, currency).negate();
-    }
-
-    private Function4<CurrencyEntity, UserEntity, BigDecimal, BigDecimal, TransactionEntity> prepareTransactionEntity() {
-        return (currencyEntity, userEntity, transactionPrice, amount) ->
-                TransactionEntity.builder()
-                        .currencyEntity(currencyEntity)
-                        .userEntity(userEntity)
-                        .currencyRate(transactionPrice)
-                        .amount(amount)
+    private Function2<UserEntity, TransactionBuilder, TransactionEntity> prepareTransactionForTransactionCurrency() {
+        return (user, transaction) ->
+                TransactionEntity
+                        .builder()
+                        .currencyEntity(transaction.getCurrencyRateEntity().getCurrencyEntity())
+                        .userEntity(user)
+                        .currencyRate(transaction.getTransactionPrice())
+                        .amount(calculateCurrencyAmount().apply(user, transaction))
                         .build();
+    }
+
+    private Function2<UserEntity, TransactionBuilder, TransactionEntity> prepareTransactionForBillingCurrency() {
+        final CurrencyEntity billingCurrencyEntity = currencyService.findBillingCurrencyRate().getCurrencyEntity();
+        return (user, transaction) ->
+                TransactionEntity
+                        .builder()
+                        .currencyEntity(billingCurrencyEntity)
+                        .userEntity(user)
+                        .currencyRate(transaction.getTransactionPrice())
+                        .amount(calculateBillingCurrencyAmount().apply(user, transaction))
+                        .build();
+    }
+
+    private Function2<UserEntity, TransactionBuilder, BigDecimal> calculateCurrencyAmount() {
+        return (user, transaction) ->
+                HashSet.ofAll(user.getRoles())
+                        .filter(roleEntity -> roleEntity.getRole().equals(RoleConstant.ROLE_USER.name()))
+                        .map(roleEntity -> transaction.getTransactionAmount().negate())
+                        .getOrElse(transaction.getTransactionAmount());
+    }
+
+    private Function2<UserEntity, TransactionBuilder, BigDecimal> calculateBillingCurrencyAmount() {
+        return (user, transaction) -> {
+            val billingCurrencyTransactionAmount = transaction.getTransactionAmount()
+                    .multiply(transaction.getTransactionPrice())
+                    .divide(transaction.getCurrencyRateEntity().getCurrencyEntity().getUnit(), HALF_UP);
+
+            return HashSet.ofAll(user.getRoles())
+                    .filter(roleEntity -> roleEntity.getRole().equals(RoleConstant.ROLE_USER.name()))
+                    .map(roleEntity -> billingCurrencyTransactionAmount)
+                    .getOrElse(billingCurrencyTransactionAmount.negate());
+        };
     }
 
     public void saveTransaction(Set<TransactionEntity> transactionEntities) {
