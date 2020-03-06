@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import pl.mkjb.exchange.model.TransactionModel;
-import pl.mkjb.exchange.security.CustomUser;
 import pl.mkjb.exchange.service.CurrencyService;
 import pl.mkjb.exchange.service.TransactionFacadeService;
 
@@ -13,6 +13,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public class TransactionAmountValidator implements ConstraintValidator<TransactionAmount, TransactionModel> {
@@ -44,11 +45,11 @@ public class TransactionAmountValidator implements ConstraintValidator<Transacti
         return isValid;
     }
 
-    private Predicate<TransactionModel> isTransactionAmountGreaterThenZero() {
+    public Predicate<TransactionModel> isTransactionAmountGreaterThenZero() {
         return transactionModel -> transactionModel.getTransactionAmount().compareTo(BigDecimal.ZERO) > 0;
     }
 
-    private Predicate<TransactionModel> isTransactionAmountDivisibleByCurrencyUnit() {
+    public Predicate<TransactionModel> isTransactionAmountDivisibleByCurrencyUnit() {
         return transactionModel -> {
             val currencyUnit = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId())
                     .getCurrencyEntity()
@@ -58,15 +59,18 @@ public class TransactionAmountValidator implements ConstraintValidator<Transacti
         };
     }
 
-    private Predicate<TransactionModel> isTransactionAmountLessThenFundsAvailableInExchange() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        val customUser = (CustomUser) authentication.getPrincipal();
+    public Predicate<TransactionModel> isTransactionAmountLessThenFundsAvailableInExchange() {
         return transactionModel -> {
             val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
             val maxTransactionAmount = transactionFacadeService.estimateMaxTransactionAmount()
                     .apply(transactionModel.getTransactionTypeConstant())
-                    .apply(currencyRateEntity, customUser);
+                    .apply(currencyRateEntity, getCustomUser().get());
             return transactionModel.getTransactionAmount().compareTo(maxTransactionAmount) < 1;
         };
+    }
+
+    public Supplier<UserDetails> getCustomUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return () -> (UserDetails) authentication.getPrincipal();
     }
 }
