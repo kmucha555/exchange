@@ -6,12 +6,10 @@ import org.mockito.Mockito;
 import pl.mkjb.exchange.entity.*;
 import pl.mkjb.exchange.model.TransactionBuilder;
 import pl.mkjb.exchange.repository.TransactionRepository;
-import pl.mkjb.exchange.security.CustomUser;
 import pl.mkjb.exchange.util.RoleConstant;
 import pl.mkjb.exchange.util.TransactionTypeConstant;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,75 +29,69 @@ class ExchangeServiceTest {
     @Test
     void givenTransactionBuilderMock_whenPrepareTransactionToSaveCalled_thenReturnTransactionEntitySet() {
         //given
-        int currencyId = 1;
-        long userId = 1;
-        String username = "test-user";
-        long ownerId = 2;
-        UUID billingCurrencyRateId = UUID.randomUUID();
-        UUID currencyRateId = UUID.randomUUID();
-        var publicationDate = LocalDateTime.of(2020, 2, 26, 17, 20, 5);
-        var createdAt = LocalDateTime.of(2020, 2, 26, 17, 20, 20);
-        CurrencyEntity currencyEntity = new CurrencyEntity(1, "US Dollar", "USD", BigDecimal.ONE, false);
-        CurrencyEntity billingCurrencyEntity = new CurrencyEntity(2, "Polish zloty", "PLN", BigDecimal.ONE, true);
-        var currencySellPrice = BigDecimal.valueOf(3.7392);
-        var currencyPurchasePrice = BigDecimal.valueOf(3.7222);
-        var currencyAveragePrice = BigDecimal.valueOf(3.7300);
+        int currencyId = 2;
         var transactionAmount = BigDecimal.TEN;
+        var currencyPurchasePrice = BigDecimal.valueOf(3.7222);
+        var username = "test-user";
 
-        var userDetails = CustomUser.buildCustomUser()
-                .id(userId)
-                .username(username)
-                .fullName(username)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .enabled(true)
-                .password(username)
-                .authorities(Set.of())
+        var transactionCurrencyEntity = CurrencyEntity.builder()
+                .id(currencyId)
+                .name("US Dollar")
+                .code("USD")
+                .unit(BigDecimal.ONE)
+                .billingCurrency(false)
                 .build();
 
-        var currencyRateEntity = new CurrencyRateEntity(
-                currencyRateId,
-                currencyEntity,
-                currencyPurchasePrice,
-                currencySellPrice,
-                currencyAveragePrice,
-                publicationDate,
-                Boolean.FALSE,
-                createdAt);
+        var billingCurrencyEntity = CurrencyEntity.builder()
+                .id(1)
+                .name("Polish zloty")
+                .code("PLN")
+                .unit(BigDecimal.ONE)
+                .billingCurrency(true)
+                .build();
 
-        var billingCurrencyRateEntity = new CurrencyRateEntity(
-                billingCurrencyRateId,
-                billingCurrencyEntity,
-                BigDecimal.ONE,
-                BigDecimal.ONE,
-                BigDecimal.ONE,
-                publicationDate,
-                Boolean.TRUE,
-                createdAt);
+        var currencyRateEntity = CurrencyRateEntity.builder()
+                .id(UUID.randomUUID())
+                .currencyEntity(transactionCurrencyEntity)
+                .purchasePrice(currencyPurchasePrice)
+                .sellPrice(BigDecimal.valueOf(3.7392))
+                .averagePrice(BigDecimal.valueOf(3.7300))
+                .active(Boolean.FALSE)
+                .build();
 
-        var roleEntityUser = new RoleEntity(1, RoleConstant.ROLE_USER.name());
-        var roleEntityOwner = new RoleEntity(2, RoleConstant.ROLE_OWNER.name());
-        var userEntity = new UserEntity(
-                1L,
-                "Mock",
-                "Mock",
-                "Mock",
-                Boolean.TRUE,
-                "Mock",
-                Set.of(roleEntityUser),
-                createdAt);
+        var billingCurrencyRateEntity = CurrencyRateEntity.builder()
+                .id(UUID.randomUUID())
+                .currencyEntity(billingCurrencyEntity)
+                .purchasePrice(BigDecimal.ONE)
+                .sellPrice(BigDecimal.ONE)
+                .averagePrice(BigDecimal.ONE)
+                .active(Boolean.TRUE)
+                .build();
 
-        var exchangeOwnerEntity = new UserEntity(ownerId,
-                "Mock",
-                "Mock",
-                "Mock",
-                Boolean.TRUE,
-                "Mock",
-                Set.of(roleEntityOwner),
-                createdAt);
+        var roleEntityUser = Set.of(new RoleEntity(1, RoleConstant.ROLE_USER.name()));
+        var roleEntityOwner = Set.of(new RoleEntity(2, RoleConstant.ROLE_OWNER.name()));
 
-        when(currencyServiceMock.findCurrencyById(currencyId)).thenReturn(currencyEntity);
+        var userEntity = UserEntity.builder()
+                .id(1L)
+                .username(username)
+                .firstName("Mock")
+                .lastName("Mock")
+                .active(Boolean.TRUE)
+                .password("Mock")
+                .roles(roleEntityUser)
+                .build();
+
+        var exchangeOwnerEntity = UserEntity.builder()
+                .id(2L)
+                .username("Exchange Owner")
+                .firstName("Mock")
+                .lastName("Mock")
+                .active(Boolean.TRUE)
+                .password("Mock")
+                .roles(roleEntityOwner)
+                .build();
+
+        when(currencyServiceMock.findCurrencyById(currencyId)).thenReturn(transactionCurrencyEntity);
         when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
         when(userServiceMock.findOwner()).thenReturn(exchangeOwnerEntity);
         when(userServiceMock.findByUsername(username)).thenReturn(userEntity);
@@ -109,30 +101,33 @@ class ExchangeServiceTest {
                 .transactionAmount(transactionAmount)
                 .transactionPrice(currencyPurchasePrice)
                 .transactionTypeConstant(TransactionTypeConstant.SELL)
-                .userDetails(userDetails)
+                .userEntity(userEntity)
                 .build();
 
         var transactionBillingCurrencyAmount = transactionBuilder.getTransactionAmount().multiply(transactionBuilder.getTransactionPrice())
-                .divide(currencyEntity.getUnit(), HALF_UP);
+                .divide(transactionCurrencyEntity.getUnit(), HALF_UP);
 
         var transactionOne = TransactionEntity.builder()
-                .currencyEntity(currencyEntity)
+                .currencyEntity(transactionBuilder.getCurrencyRateEntity().getCurrencyEntity())
                 .userEntity(userEntity)
                 .currencyRate(transactionBuilder.getTransactionPrice())
                 .amount(transactionBuilder.getTransactionAmount().negate())
                 .build();
+
         var transactionTwo = TransactionEntity.builder()
-                .currencyEntity(currencyEntity)
+                .currencyEntity(transactionBuilder.getCurrencyRateEntity().getCurrencyEntity())
                 .userEntity(exchangeOwnerEntity)
                 .currencyRate(transactionBuilder.getTransactionPrice())
                 .amount(transactionBuilder.getTransactionAmount())
                 .build();
+
         var transactionThree = TransactionEntity.builder()
                 .currencyEntity(billingCurrencyEntity)
                 .userEntity(userEntity)
                 .currencyRate(transactionBuilder.getTransactionPrice())
                 .amount(transactionBillingCurrencyAmount)
                 .build();
+
         var transactionFour = TransactionEntity.builder()
                 .currencyEntity(billingCurrencyEntity)
                 .userEntity(exchangeOwnerEntity)

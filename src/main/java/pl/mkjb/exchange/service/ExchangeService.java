@@ -27,6 +27,7 @@ public class ExchangeService {
     public Set<TransactionEntity> prepareTransactionToSave(TransactionBuilder transactionBuilder) {
         final UserEntity exchangeOwnerEntity = userService.findOwner();
         final UserEntity userEntity = transactionBuilder.getUserEntity();
+
         return Set.of(
                 prepareTransactionForTransactionCurrency().apply(userEntity, transactionBuilder),
                 prepareTransactionForBillingCurrency().apply(userEntity, transactionBuilder),
@@ -42,7 +43,7 @@ public class ExchangeService {
                         .currencyEntity(transaction.getCurrencyRateEntity().getCurrencyEntity())
                         .userEntity(user)
                         .currencyRate(transaction.getTransactionPrice())
-                        .amount(calculateCurrencyAmount().apply(user, transaction))
+                        .amount(calculateTransactionCurrencyAmount().apply(user, transaction))
                         .build();
     }
 
@@ -58,7 +59,7 @@ public class ExchangeService {
                         .build();
     }
 
-    private Function2<UserEntity, TransactionBuilder, BigDecimal> calculateCurrencyAmount() {
+    private Function2<UserEntity, TransactionBuilder, BigDecimal> calculateTransactionCurrencyAmount() {
         return (user, transaction) ->
                 HashSet.ofAll(user.getRoles())
                         .filter(roleEntity -> roleEntity.getRole().equals(RoleConstant.ROLE_USER.name()))
