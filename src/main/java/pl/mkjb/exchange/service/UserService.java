@@ -38,7 +38,7 @@ public class UserService {
     public boolean isGivenUserNameAlreadyUsed(UserModel userModel) {
         return userRepository.findByUsername(userModel.getUserName())
                 .map(userEntity -> userModel.getId() != userEntity.getId())
-                .orElse(false);
+                .getOrElse(false);
     }
 
     @Transactional
@@ -56,7 +56,7 @@ public class UserService {
 
     public UserEntity findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> {
+                .getOrElseThrow(() -> {
                     log.error("Given username not found: {}", username);
                     throw new UsernameNotFoundException("Given username not found: " + username);
                 });
@@ -65,9 +65,7 @@ public class UserService {
     public UserEntity findOwner() {
         val roleEntity = findRoleByName(ROLE_OWNER);
         return userRepository.findByRolesContaining(roleEntity)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> {
+                .getOrElseThrow(() -> {
                     log.error("User with ROLE_OWNER not found");
                     throw new BadResourceException("User with ROLE_OWNER not found");
                 });

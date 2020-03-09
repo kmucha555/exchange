@@ -1,5 +1,7 @@
 package pl.mkjb.exchange.service;
 
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -14,7 +16,6 @@ import pl.mkjb.exchange.security.CustomUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -97,7 +98,7 @@ class WalletServiceTest {
                 .accountNonLocked(true)
                 .credentialsNonExpired(true)
                 .accountNonExpired(true)
-                .authorities(Set.of())
+                .authorities(java.util.Set.of())
                 .build();
     }
 
@@ -105,7 +106,7 @@ class WalletServiceTest {
     void givenZeroInUserWalletForBillingCurrency_whenTestingUserHasInsufficientFunds_thenReturnTrue() {
         //given
         var userWalletCurrencyAmount = BigDecimal.ZERO;
-        var userWallet = Set.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, BigDecimal.ONE));
+        var userWallet = HashSet.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, BigDecimal.ONE));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
@@ -121,7 +122,7 @@ class WalletServiceTest {
     void givenGreaterThanZeroInUserWalletForBillingCurrency_whenTestingUserHasInsufficientFunds_thenReturnFalse() {
         //given
         var userWalletCurrencyAmount = BigDecimal.TEN;
-        var userWallet = Set.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, billingCurrencyPurchasePrice));
+        var userWallet = HashSet.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, billingCurrencyPurchasePrice));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
@@ -137,7 +138,7 @@ class WalletServiceTest {
     void givenGreaterThanZeroAmountInUserWalletForBillingCurrency_whenGetWalletAmountForBillingCurrency_thenReturnInputAmount() {
         //given
         var userWalletCurrencyAmount = BigDecimal.TEN;
-        var userWallet = Set.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, billingCurrencyPurchasePrice));
+        var userWallet = HashSet.of(new UserWalletModel(billingCurrencyRateId, "PLN", BigDecimal.ONE, userWalletCurrencyAmount, billingCurrencyPurchasePrice));
         when(currencyServiceMock.findBillingCurrencyRate()).thenReturn(billingCurrencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
 
@@ -152,7 +153,7 @@ class WalletServiceTest {
     void givenGreaterThanZeroAmountInUserWalletForCurrency_whenGetWalletAmountForCurrency_thenReturnInputAmount() {
         //given
         var userWalletCurrencyAmount = BigDecimal.TEN;
-        var userWallet = Set.of(new UserWalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmount, currencyPurchasePrice));
+        var userWallet = HashSet.of(new UserWalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmount, currencyPurchasePrice));
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntity);
         when(transactionRepositoryMock.findUserWallet(userDetails.getUsername())).thenReturn(userWallet);
 
@@ -179,13 +180,13 @@ class WalletServiceTest {
                 .createdAt(createdAt)
                 .build();
 
-        var currencyModels = Set.of(
+        var currencyModels = java.util.Set.of(
                 CurrencyModel.buildCurrencyModel(currencyRateEntityCZK)
         );
 
         var currencyRatesModel = CurrencyRatesModel.of(publicationDate, currencyModels);
 
-        var userWallet = Set.of(
+        var userWallet = HashSet.of(
                 new UserWalletModel(currencyRateId, "USD", BigDecimal.ONE, userWalletCurrencyAmountUSD, currencyPurchasePrice)
         );
 

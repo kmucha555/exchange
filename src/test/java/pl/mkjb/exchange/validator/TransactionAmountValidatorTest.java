@@ -24,50 +24,26 @@ import static pl.mkjb.exchange.util.TransactionTypeConstant.BUY;
 
 @Slf4j
 class TransactionAmountValidatorTest {
-    private TransactionModel transactionModelUSD;
-    private TransactionModel transactionModelCZK;
     private CurrencyRateEntity currencyRateEntityUSD;
     private CurrencyRateEntity currencyRateEntityCZK;
     private CustomUser userDetails;
-    private UUID currencyRateId;
-    private BigDecimal maxAllowedTransactionAmount;
+    private final UUID currencyRateId = UUID.randomUUID();
+    private final BigDecimal maxAllowedTransactionAmount = BigDecimal.valueOf(1000);
+    private final BigDecimal userWalletAmount = BigDecimal.valueOf(100);
+    private final BigDecimal transactionPriceUSD = BigDecimal.valueOf(3.3434);
+    private final BigDecimal transactionPriceCZK = BigDecimal.valueOf(14.3434);
     private final Transaction transactionBuyServiceMock = mock(TransactionBuyService.class);
     private final Transaction transactionSellServiceMock = mock(TransactionSellService.class);
     private final CurrencyService currencyServiceMock = mock(CurrencyService.class);
     private final Authentication authenticationMock = mock(Authentication.class);
     private final SecurityContext securityContextMock = mock(SecurityContext.class);
-    private final TransactionFacadeService transactionFacadeService = new TransactionFacadeService(transactionBuyServiceMock, transactionSellServiceMock);
+    private final TransactionFacadeService transactionFacadeService =
+            new TransactionFacadeService(transactionBuyServiceMock, transactionSellServiceMock);
     private final TransactionAmountValidator transactionAmountValidator =
             new TransactionAmountValidator(currencyServiceMock, transactionFacadeService);
 
     @BeforeEach
     void init() {
-        var transactionPriceUSD = BigDecimal.valueOf(3.3434);
-        var transactionPriceCZK = BigDecimal.valueOf(14.3434);
-        maxAllowedTransactionAmount = BigDecimal.valueOf(1000);
-        var userWalletAmount = BigDecimal.valueOf(100);
-        currencyRateId = UUID.randomUUID();
-
-        transactionModelUSD = TransactionModel.builder()
-                .currencyRateId(currencyRateId)
-                .currencyCode("USD")
-                .currencyUnit(BigDecimal.ONE)
-                .transactionPrice(transactionPriceUSD)
-                .userWalletAmount(userWalletAmount)
-                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
-                .transactionTypeConstant(BUY)
-                .build();
-
-        transactionModelCZK = TransactionModel.builder()
-                .currencyRateId(currencyRateId)
-                .currencyCode("CZK")
-                .currencyUnit(BigDecimal.valueOf(100))
-                .transactionPrice(transactionPriceCZK)
-                .userWalletAmount(userWalletAmount)
-                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
-                .transactionTypeConstant(BUY)
-                .build();
-
         var currencyEntityUSD = CurrencyEntity.builder()
                 .id(1)
                 .name("US Dollar")
@@ -119,7 +95,16 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountIsLessThenZero() {
         //given
         var transactionAmount = BigDecimal.valueOf(-1);
-        transactionModelUSD.setTransactionAmount(transactionAmount);
+        var transactionModelUSD = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("USD")
+                .currencyUnit(BigDecimal.ONE)
+                .transactionPrice(transactionPriceUSD)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
 
         //when
         final boolean test = transactionAmountValidator.isTransactionAmountGreaterThenZero().test(transactionModelUSD);
@@ -132,7 +117,17 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountEqualsZero() {
         //given
         var transactionAmount = BigDecimal.ZERO;
-        transactionModelUSD.setTransactionAmount(transactionAmount);
+        var transactionModelUSD = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("USD")
+                .currencyUnit(BigDecimal.ONE)
+                .transactionPrice(transactionPriceUSD)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
+
 
         //when
         final boolean test = transactionAmountValidator.isTransactionAmountGreaterThenZero().test(transactionModelUSD);
@@ -145,7 +140,17 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountGreaterThanZero() {
         //given
         var transactionAmount = BigDecimal.ONE;
-        transactionModelUSD.setTransactionAmount(transactionAmount);
+        var transactionModelUSD = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("USD")
+                .currencyUnit(BigDecimal.ONE)
+                .transactionPrice(transactionPriceUSD)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
+
 
         //when
         final boolean test = transactionAmountValidator.isTransactionAmountGreaterThenZero().test(transactionModelUSD);
@@ -158,7 +163,16 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountDivisibleByCurrencyUnitEquals1() {
         //given
         var transactionAmount = BigDecimal.ONE;
-        transactionModelUSD.setTransactionAmount(transactionAmount);
+        var transactionModelUSD = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("USD")
+                .currencyUnit(BigDecimal.ONE)
+                .transactionPrice(transactionPriceUSD)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntityUSD);
 
         //when
@@ -172,7 +186,16 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountIsNotDivisibleByCurrencyUnitEquals1() {
         //given
         var transactionAmount = BigDecimal.valueOf(1.5);
-        transactionModelUSD.setTransactionAmount(transactionAmount);
+        var transactionModelUSD = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("USD")
+                .currencyUnit(BigDecimal.ONE)
+                .transactionPrice(transactionPriceUSD)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntityUSD);
 
         //when
@@ -186,7 +209,16 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountDivisibleByCurrencyUnitEquals100() {
         //given
         var transactionAmount = BigDecimal.valueOf(100);
-        transactionModelCZK.setTransactionAmount(transactionAmount);
+        var transactionModelCZK = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("CZK")
+                .currencyUnit(BigDecimal.valueOf(100))
+                .transactionPrice(transactionPriceCZK)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntityCZK);
 
         //when
@@ -200,7 +232,16 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountIsNotDivisibleByCurrencyUnitEquals100() {
         //given
         var transactionAmount = BigDecimal.valueOf(101);
-        transactionModelCZK.setTransactionAmount(transactionAmount);
+        var transactionModelCZK = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("CZK")
+                .currencyUnit(BigDecimal.valueOf(100))
+                .transactionPrice(transactionPriceCZK)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
         when(currencyServiceMock.findCurrencyRateByCurrencyRateId(currencyRateId)).thenReturn(currencyRateEntityCZK);
 
         //when
@@ -214,8 +255,16 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountIsLessThenAvailableFundsInExchange() {
         //given
         var transactionAmount = BigDecimal.valueOf(100);
-        transactionModelUSD.setTransactionAmount(transactionAmount);
-
+        var transactionModelUSD = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("USD")
+                .currencyUnit(BigDecimal.ONE)
+                .transactionPrice(transactionPriceUSD)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
         when(securityContextMock.getAuthentication()).thenReturn(authenticationMock);
         SecurityContextHolder.setContext(securityContextMock);
         when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
@@ -235,8 +284,16 @@ class TransactionAmountValidatorTest {
     void shouldPassIfTransactionAmountIsGreaterThenAvailableFundsInExchange() {
         //given
         var transactionAmount = BigDecimal.valueOf(10000);
-        transactionModelUSD.setTransactionAmount(transactionAmount);
-
+        var transactionModelUSD = TransactionModel.builder()
+                .currencyRateId(currencyRateId)
+                .currencyCode("USD")
+                .currencyUnit(BigDecimal.ONE)
+                .transactionPrice(transactionPriceUSD)
+                .userWalletAmount(userWalletAmount)
+                .transactionAmount(transactionAmount)
+                .maxAllowedTransactionAmount(maxAllowedTransactionAmount)
+                .transactionTypeConstant(BUY)
+                .build();
         when(securityContextMock.getAuthentication()).thenReturn(authenticationMock);
         SecurityContextHolder.setContext(securityContextMock);
         when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);

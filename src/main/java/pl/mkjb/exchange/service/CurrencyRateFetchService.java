@@ -1,5 +1,7 @@
 package pl.mkjb.exchange.service;
 
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,9 +13,6 @@ import pl.mkjb.exchange.model.CurrencyRatesModel;
 import pl.mkjb.exchange.repository.CurrencyRateRepository;
 import pl.mkjb.exchange.repository.CurrencyRepository;
 import pl.mkjb.exchange.restclient.RestClient;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,8 +38,7 @@ public class CurrencyRateFetchService {
     }
 
     private Set<CurrencyRateEntity> buildCurrenciesRatesEntities(CurrencyRatesModel currenciesRates) {
-        return currenciesRates.getItems()
-                .stream()
+        return HashSet.ofAll(currenciesRates.getItems())
                 .map(currencyModel ->
                         CurrencyRateEntity.builder()
                                 .currencyEntity(getCurrencyEntity(currencyModel))
@@ -49,7 +47,7 @@ public class CurrencyRateFetchService {
                                 .sellPrice(currencyModel.getSellPrice())
                                 .publicationDate(currenciesRates.getPublicationDate())
                                 .build())
-                .collect(Collectors.toUnmodifiableSet());
+                .toSet();
     }
 
     private CurrencyEntity getCurrencyEntity(CurrencyModel currencyModel) {

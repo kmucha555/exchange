@@ -1,5 +1,6 @@
 package pl.mkjb.exchange.repository;
 
+import io.vavr.collection.Set;
 import io.vavr.control.Option;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -9,7 +10,6 @@ import pl.mkjb.exchange.entity.TransactionEntity;
 import pl.mkjb.exchange.model.UserWalletModel;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 @Repository
 public interface TransactionRepository extends CrudRepository<TransactionEntity, Long> {

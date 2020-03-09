@@ -1,20 +1,16 @@
 package pl.mkjb.exchange.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import pl.mkjb.exchange.model.UserModel;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "users", indexes = @Index(columnList = "user_name", unique = true))
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Data
 public class UserEntity {
@@ -40,7 +36,7 @@ public class UserEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private Set<RoleEntity> roles = new HashSet<>();
+    private Set<RoleEntity> roles;
 
     private LocalDateTime createdAt;
 

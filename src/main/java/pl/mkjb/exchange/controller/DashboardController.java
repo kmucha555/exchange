@@ -40,7 +40,7 @@ public class DashboardController {
     public ResponseEntity<Set<UserWalletModel>> getUserWallet(@AuthenticationPrincipal CustomUser customUser) {
         if (futureProcessingRestClient.isConnectionAlive()) {
             val userWallet = walletService.getUserWallet(customUser);
-            return ResponseEntity.status(HttpStatus.OK).body(userWallet);
+            return ResponseEntity.status(HttpStatus.OK).body(userWallet.toJavaSet());
         }
         return ResponseEntity.notFound().build();
     }
