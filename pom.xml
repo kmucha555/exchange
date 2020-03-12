@@ -20,6 +20,9 @@
         <passay.version>1.5.0</passay.version>
         <awaitility.version>3.1.6</awaitility.version>
         <font-awesome.version>5.12.0</font-awesome.version>
+        <datatables.version>1.10.20</datatables.version>
+        <bootstrap.version>4.4.1</bootstrap.version>
+        <jquery.version>3.3.1</jquery.version>
     </properties>
 
     <dependencies>
@@ -104,6 +107,21 @@
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
             <version>${font-awesome.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>datatables</artifactId>
+            <version>${datatables.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>${bootstrap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>jquery</artifactId>
+            <version>${jquery.version}</version>
         </dependency>
     </dependencies>
 
