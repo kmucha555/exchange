@@ -156,8 +156,14 @@ class CurrencyServiceTest {
     @Test
     void shouldReturnTrueWhenGivenCurrencyRateIdIsArchived() {
         //given
-        currencyRateEntity.setActive(Boolean.FALSE);
-        when(currencyRateRepositoryMock.findById(currencyRateId)).thenReturn(Optional.of(currencyRateEntity));
+        var archivedCurrencyRateEntity = CurrencyRateEntity.builder()
+                .id(currencyRateId)
+                .currencyEntity(currencyEntity)
+                .publicationDate(publicationDate)
+                .active(Boolean.FALSE)
+                .build();
+
+        when(currencyRateRepositoryMock.findById(currencyRateId)).thenReturn(Optional.of(archivedCurrencyRateEntity));
 
         //when
         final boolean test = currencyService.isArchivedCurrencyRate(currencyRateId);

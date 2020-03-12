@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Data
 @Entity
+@Getter
 @Table(name = "currencies")
 public class CurrencyEntity {
     @Id
