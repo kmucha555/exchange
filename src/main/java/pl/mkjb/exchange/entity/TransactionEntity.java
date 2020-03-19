@@ -1,10 +1,7 @@
 package pl.mkjb.exchange.entity;
 
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@EqualsAndHashCode
 @Table(name = "transactions")
 public class TransactionEntity {
     @Id
