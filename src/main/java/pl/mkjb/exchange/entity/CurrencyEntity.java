@@ -1,16 +1,13 @@
 package pl.mkjb.exchange.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Data
 @Entity
 @Table(name = "currencies")
@@ -28,11 +25,11 @@ public class CurrencyEntity {
     @Column(nullable = false, precision = 4, scale = 0)
     private BigDecimal unit;
 
-    @Column(name = "base_currency", nullable = false)
-    private Boolean baseCurrency;
+    @Column(name = "billing_currency", nullable = false)
+    private Boolean billingCurrency;
 
     @PrePersist
     public void prePersist() {
-        this.baseCurrency = Boolean.FALSE;
+        this.billingCurrency = Boolean.FALSE;
     }
 }

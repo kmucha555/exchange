@@ -26,7 +26,7 @@ public class FutureProcessingRestClient implements RestClient {
     private String currencyRatesUrl;
 
     @Override
-    public CurrencyRatesModel getCurrenciesRates() {
+    public Option<CurrencyRatesModel> getCurrenciesRates() {
         try {
 
             this.restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
@@ -36,8 +36,7 @@ public class FutureProcessingRestClient implements RestClient {
 
             return Option.of(currencyRatesModelResponseEntity)
                     .map(HttpEntity::getBody)
-                    .peek(currencyRatesModel -> log.info("Rest Client response body {}", currencyRatesModel))
-                    .getOrElseThrow(() -> new BadResourceException("Invalid JSON response " + currencyRatesModelResponseEntity));
+                    .peek(currencyRatesModel -> log.info("Rest Client response body {}", currencyRatesModel));
 
         } catch (RestClientException e) {
             activeConnection.set(false);

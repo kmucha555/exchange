@@ -1,5 +1,7 @@
 package pl.mkjb.exchange.service;
 
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,10 +14,6 @@ import pl.mkjb.exchange.repository.CurrencyRateRepository;
 import pl.mkjb.exchange.repository.CurrencyRepository;
 import pl.mkjb.exchange.restclient.RestClient;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -26,25 +24,30 @@ public class CurrencyRateFetchService {
 
     @Scheduled(fixedRateString = "${pl.mkjb.exchange.service.CurrencyRateFetchService.fixedDelay.in.milliseconds}")
     public void updateCurrenciesRates() {
-        final CurrencyRatesModel currenciesRates = futureProcessingRestClient.getCurrenciesRates();
-        if (isNewCurrencyRateAvailable(currenciesRates)) {
-            currencyRateRepository.archiveCurrencyRates();
-            currencyRateRepository.saveAll(buildCurrencyRateEntity(currenciesRates));
-            log.info("New exchange rates available. Saving to database.");
-        }
+        futureProcessingRestClient.getCurrenciesRates()
+                .filter(this::hasNewCurrencyRatesBundleBeenPublished)
+                .peek(currenciesRates -> currencyRateRepository.archiveCurrencyRates())
+                .map(this::buildCurrenciesRatesEntities)
+                .peek(currenciesRates -> log.info("New exchange rates available. Saving to database: {}", currenciesRates))
+                .map(currencyRateRepository::saveAll)
+                .onEmpty(() -> log.info("No new exchange rates has been published"));
     }
 
-    private Set<CurrencyRateEntity> buildCurrencyRateEntity(CurrencyRatesModel currenciesRates) {
-        return currenciesRates.getItems()
-                .stream()
-                .map(currencyModel -> CurrencyRateEntity.builder()
-                        .currencyEntity(getCurrencyEntity(currencyModel))
-                        .averagePrice(currencyModel.getAveragePrice())
-                        .purchasePrice(currencyModel.getPurchasePrice())
-                        .sellPrice(currencyModel.getSellPrice())
-                        .publicationDate(currenciesRates.getPublicationDate())
-                        .build())
-                .collect(Collectors.toUnmodifiableSet());
+    private boolean hasNewCurrencyRatesBundleBeenPublished(CurrencyRatesModel currencyRatesModel) {
+        return currencyRateRepository.countByPublicationDate(currencyRatesModel.getPublicationDate()) == 0;
+    }
+
+    private Set<CurrencyRateEntity> buildCurrenciesRatesEntities(CurrencyRatesModel currenciesRates) {
+        return HashSet.ofAll(currenciesRates.getItems())
+                .map(currencyModel ->
+                        CurrencyRateEntity.builder()
+                                .currencyEntity(getCurrencyEntity(currencyModel))
+                                .averagePrice(currencyModel.getAveragePrice())
+                                .purchasePrice(currencyModel.getPurchasePrice())
+                                .sellPrice(currencyModel.getSellPrice())
+                                .publicationDate(currenciesRates.getPublicationDate())
+                                .build())
+                .toSet();
     }
 
     private CurrencyEntity getCurrencyEntity(CurrencyModel currencyModel) {
@@ -53,10 +56,5 @@ public class CurrencyRateFetchService {
                     log.error("Missing currency code {}", currencyModel);
                     throw new IllegalArgumentException("Missing currency code");
                 });
-    }
-
-    private boolean isNewCurrencyRateAvailable(CurrencyRatesModel currencyRatesModel) {
-        final LocalDateTime publicationDate = currencyRatesModel.getPublicationDate();
-        return currencyRateRepository.countByPublicationDate(publicationDate) == 0;
     }
 }

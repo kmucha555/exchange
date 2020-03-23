@@ -2,6 +2,7 @@ package pl.mkjb.exchange.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.mkjb.exchange.entity.CurrencyRateEntity;
@@ -14,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static java.math.RoundingMode.DOWN;
-import static pl.mkjb.exchange.util.TransactionType.SELL;
+import static pl.mkjb.exchange.util.TransactionTypeConstant.SELL;
 
 @Service
 @RequiredArgsConstructor
@@ -26,17 +27,7 @@ public class TransactionSellService implements Transaction {
     private final TransactionRepository transactionRepository;
 
     @Override
-    public boolean hasErrors(TransactionModel transactionModel, long userId) {
-        val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
-        val buyAmount = transactionModel.getTransactionAmount();
-
-        return buyAmount.compareTo(BigDecimal.ZERO) <= 0 ||
-                buyAmount.remainder(currencyRateEntity.getCurrencyEntity().getUnit()).compareTo(BigDecimal.ZERO) != 0 ||
-                buyAmount.compareTo(estimateMaxTransactionAmount(currencyRateEntity, userId)) > 0;
-    }
-
-    @Override
-    public TransactionModel getTransactionModel(UUID currencyRateId, long userId) {
+    public TransactionModel getTransactionModel(UUID currencyRateId, UserDetails userDetails) {
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(currencyRateId);
 
         return TransactionModel.builder()
@@ -44,44 +35,43 @@ public class TransactionSellService implements Transaction {
                 .currencyCode(currencyRateEntity.getCurrencyEntity().getCode())
                 .currencyUnit(currencyRateEntity.getCurrencyEntity().getUnit())
                 .transactionPrice(currencyRateEntity.getPurchasePrice())
-                .userWalletAmount(walletService.getUserWalletAmountForGivenCurrency(currencyRateId, userId).setScale(0, DOWN))
-                .maxAllowedTransactionAmount(estimateMaxTransactionAmount(currencyRateEntity, userId).setScale(0, DOWN))
+                .userWalletAmount(walletService.getUserWalletAmountForGivenCurrency(currencyRateId, userDetails).setScale(0, DOWN))
+                .maxAllowedTransactionAmount(estimateMaxAllowedTransactionAmountForUser(currencyRateEntity, userDetails).setScale(0, DOWN))
+                .transactionTypeConstant(SELL)
                 .build();
     }
 
-    private BigDecimal estimateMaxTransactionAmount(CurrencyRateEntity currencyRateEntity, long userId) {
-        val baseCurrencyRateEntity = currencyService.findBaseCurrencyRate();
-        val userWalletAmount = walletService.getUserWalletAmountForGivenCurrency(currencyRateEntity.getId(), userId);
-        val exchangeCurrencyAmount = calculateAvailableCurrency(baseCurrencyRateEntity)
+    public BigDecimal estimateMaxAllowedTransactionAmountForUser(CurrencyRateEntity currencyRateEntity, UserDetails userDetails) {
+        val billingCurrencyRateEntity = currencyService.findBillingCurrencyRate();
+        val userWalletAmount = walletService.getUserWalletAmountForGivenCurrency(currencyRateEntity.getId(), userDetails);
+        val exchangeCurrencyAmount = calculateAvailableCurrency(billingCurrencyRateEntity)
                 .divide(currencyRateEntity.getPurchasePrice(), 0, DOWN)
                 .multiply(currencyRateEntity.getCurrencyEntity().getUnit());
+
         return userWalletAmount.min(exchangeCurrencyAmount);
     }
 
-    private BigDecimal calculateAvailableCurrency(CurrencyRateEntity currencyRateEntity, long userId) {
-        val userEntity = userService.findById(userId);
+    private BigDecimal calculateAvailableCurrency(CurrencyRateEntity currencyRateEntity) {
+        final UserEntity userEntity = userService.findOwner();
         return transactionRepository
                 .sumCurrencyAmountForUser(userEntity.getId(), currencyRateEntity.getCurrencyEntity().getId())
                 .getOrElse(BigDecimal.ZERO);
     }
 
-    private BigDecimal calculateAvailableCurrency(CurrencyRateEntity currencyRateEntity) {
-        final UserEntity ownerEntity = userService.findOwner();
-        return calculateAvailableCurrency(currencyRateEntity, ownerEntity.getId());
-    }
-
     @Override
     @Transactional
-    public void saveTransaction(TransactionModel transactionModel, long userId) {
+    public void saveTransaction(TransactionModel transactionModel, UserDetails userDetails) {
+        val userEntity = userService.findByUsername(userDetails.getUsername());
         val currencyRateEntity = currencyService.findCurrencyRateByCurrencyRateId(transactionModel.getCurrencyRateId());
         val transactionBuilder = TransactionBuilder.builder()
                 .currencyRateEntity(currencyRateEntity)
                 .transactionAmount(transactionModel.getTransactionAmount())
                 .transactionPrice(currencyRateEntity.getPurchasePrice())
-                .userId(userId)
-                .transactionType(SELL)
+                .userEntity(userEntity)
+                .transactionTypeConstant(SELL)
                 .build();
         val transactionEntities = exchangeService.prepareTransactionToSave(transactionBuilder);
+
         exchangeService.saveTransaction(transactionEntities);
     }
 }

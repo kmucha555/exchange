@@ -14,17 +14,17 @@ import java.util.UUID;
 
 @Repository
 public interface CurrencyRateRepository extends CrudRepository<CurrencyRateEntity, UUID> {
-    Long countByPublicationDate(LocalDateTime publicationDate);
+    long countByPublicationDate(LocalDateTime publicationDate);
 
-    @Query("select cr from CurrencyRateEntity cr where cr.active = true and cr.currencyEntity.baseCurrency = false")
+    @Query("select cr from CurrencyRateEntity cr where cr.active = true and cr.currencyEntity.billingCurrency = false")
     Set<CurrencyRateEntity> findByActiveTrue();
 
     @Transactional
     @Modifying
     @Query(value = "UPDATE currency_rates cr JOIN currencies c ON cr.currency_id = c.id " +
-            "SET cr.active = false WHERE cr.active = true and c.base_currency = false",
+            "SET cr.active = false WHERE cr.active = true and c.billing_currency = false",
             nativeQuery = true)
     void archiveCurrencyRates();
 
-    Option<CurrencyRateEntity> findByCurrencyEntityBaseCurrencyIsTrue();
+    Option<CurrencyRateEntity> findByCurrencyEntityBillingCurrencyIsTrue();
 }

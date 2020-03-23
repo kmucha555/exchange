@@ -54,7 +54,7 @@ class FutureProcessingRestClientTest {
                 .thenReturn(ResponseEntity.status(HttpStatus.OK).body(currencyRatesModel));
 
         //when
-        final CurrencyRatesModel test = futureProcessingRestClient.getCurrenciesRates();
+        final CurrencyRatesModel test = futureProcessingRestClient.getCurrenciesRates().get();
 
         //then
         assertThat(test, equalTo(currencyRatesModel));

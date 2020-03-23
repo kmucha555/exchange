@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pl.mkjb.exchange.model.CurrencyRatesModel;
-import pl.mkjb.exchange.model.WalletModel;
+import pl.mkjb.exchange.model.UserWalletModel;
 import pl.mkjb.exchange.restclient.RestClient;
-import pl.mkjb.exchange.security.CustomAuthenticatedUser;
+import pl.mkjb.exchange.security.CustomUser;
 import pl.mkjb.exchange.service.CurrencyService;
 import pl.mkjb.exchange.service.WalletService;
 
@@ -37,10 +37,10 @@ public class DashboardController {
 
     @ResponseBody
     @GetMapping("/wallet")
-    public ResponseEntity<Set<WalletModel>> getUserWallet(@AuthenticationPrincipal CustomAuthenticatedUser customAuthenticatedUser) {
+    public ResponseEntity<Set<UserWalletModel>> getUserWallet(@AuthenticationPrincipal CustomUser customUser) {
         if (futureProcessingRestClient.isConnectionAlive()) {
-            val userWallet = walletService.getUserWallet(customAuthenticatedUser.getId());
-            return ResponseEntity.status(HttpStatus.OK).body(userWallet);
+            val userWallet = walletService.getUserWallet(customUser);
+            return ResponseEntity.status(HttpStatus.OK).body(userWallet.toJavaSet());
         }
         return ResponseEntity.notFound().build();
     }
@@ -56,8 +56,8 @@ public class DashboardController {
     }
 
     @ModelAttribute("baseCurrencyAmount")
-    public BigDecimal getUserWalletBaseCurrencyAmount(@AuthenticationPrincipal CustomAuthenticatedUser customAuthenticatedUser) {
-        return walletService.getUserWalletAmountForBaseCurrency(customAuthenticatedUser.getId());
+    public BigDecimal getUserWalletBillingCurrencyAmount(@AuthenticationPrincipal CustomUser customUser) {
+        return walletService.getUserWalletAmountForBillingCurrency(customUser);
     }
 }
 

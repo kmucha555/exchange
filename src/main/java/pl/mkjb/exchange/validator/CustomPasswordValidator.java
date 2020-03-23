@@ -1,9 +1,9 @@
 package pl.mkjb.exchange.validator;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.passay.PasswordData;
 import org.passay.PasswordValidator;
-import org.passay.RuleResult;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -14,7 +14,7 @@ public class CustomPasswordValidator implements ConstraintValidator<Password, St
 
     @Override
     public boolean isValid(String passwordCandidate, ConstraintValidatorContext constraintValidatorContext) {
-        final RuleResult result = passwordValidator.validate(new PasswordData(passwordCandidate));
-        return result.isValid();
+        val passwordCandidateData = new PasswordData(passwordCandidate);
+        return passwordValidator.validate(passwordCandidateData).isValid();
     }
 }

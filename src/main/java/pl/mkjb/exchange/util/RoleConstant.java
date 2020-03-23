@@ -1,6 +1,6 @@
 package pl.mkjb.exchange.util;
 
-public enum Role {
+public enum RoleConstant {
     ROLE_OWNER,
     ROLE_USER
 }

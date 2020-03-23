@@ -10,14 +10,14 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @Data
-public class WalletModel {
+public class UserWalletModel {
     private UUID currencyRateId;
     private String code;
     private BigDecimal unit;
     private BigDecimal amount;
     private BigDecimal purchasePrice;
 
-    public WalletModel(String code, BigDecimal amount) {
+    public UserWalletModel(String code, BigDecimal amount) {
         this.code = code;
         this.amount = amount;
     }

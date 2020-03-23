@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.mkjb.exchange.util.TransactionTypeConstant;
+import pl.mkjb.exchange.validator.TransactionAmount;
+import pl.mkjb.exchange.validator.TransactionType;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -13,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@TransactionAmount(transactionAmountFieldName = "transactionAmount")
 public class TransactionModel {
     private UUID currencyRateId;
     private String currencyCode;
@@ -24,4 +28,7 @@ public class TransactionModel {
     private BigDecimal transactionAmount;
 
     private BigDecimal maxAllowedTransactionAmount;
+
+    @TransactionType
+    private TransactionTypeConstant transactionTypeConstant;
 }

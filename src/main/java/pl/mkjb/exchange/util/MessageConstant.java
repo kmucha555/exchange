@@ -1,6 +1,6 @@
 package pl.mkjb.exchange.util;
 
-public enum Message {
+public enum MessageConstant {
     MESSAGE_SUCCESS,
     MESSAGE_FAILED,
 }

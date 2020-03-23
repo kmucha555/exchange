@@ -11,7 +11,7 @@ public class BadResourceException extends RuntimeException {
         super("Given value " + givenValue + " caused exception in " + placeOfException.getName());
     }
 
-    public <T, V> BadResourceException(String message) {
+    public BadResourceException(String message) {
         super("Message: " + message);
     }
 }

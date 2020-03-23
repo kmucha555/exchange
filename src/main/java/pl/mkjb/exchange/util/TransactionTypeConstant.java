@@ -1,6 +1,6 @@
 package pl.mkjb.exchange.util;
 
-public enum TransactionType {
+public enum TransactionTypeConstant {
     BUY,
     SELL
 }

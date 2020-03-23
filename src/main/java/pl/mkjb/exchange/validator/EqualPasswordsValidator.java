@@ -1,5 +1,6 @@
 package pl.mkjb.exchange.validator;
 
+import lombok.val;
 import org.springframework.beans.BeanWrapperImpl;
 
 import javax.validation.ConstraintValidator;
@@ -24,7 +25,7 @@ public class EqualPasswordsValidator implements ConstraintValidator<EqualFields,
         Object fieldValueConfirm = new BeanWrapperImpl(object)
                 .getPropertyValue(fieldConfirm);
 
-        final boolean areEqual = fieldValue != null && fieldValue.equals(fieldValueConfirm);
+        val areEqual = fieldValue != null && fieldValue.equals(fieldValueConfirm);
 
         if (!areEqual) {
             constraintValidatorContext.disableDefaultConstraintViolation();

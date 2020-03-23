@@ -41,9 +41,9 @@ public class CurrencyService {
                 .orElseThrow(() -> new BadResourceException("Given currency is invalid: " + id));
     }
 
-    public CurrencyRateEntity findBaseCurrencyRate() {
-        return currencyRateRepository.findByCurrencyEntityBaseCurrencyIsTrue()
-                .getOrElseThrow(() -> new BadResourceException("No base currency found"));
+    public CurrencyRateEntity findBillingCurrencyRate() {
+        return currencyRateRepository.findByCurrencyEntityBillingCurrencyIsTrue()
+                .getOrElseThrow(() -> new BadResourceException("No billing currency found"));
     }
 
     public CurrencyRateEntity findCurrencyRateByCurrencyRateId(UUID id) {
