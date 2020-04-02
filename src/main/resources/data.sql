@@ -15,9 +15,9 @@ VALUES (7, 'PLN', 'Polish zloty', 1, true);
 INSERT INTO currency_rates (id, active, average_price, created_at, publication_date, purchase_price, sell_price,
                             currency_id)
 VALUES (1, 1, 1, '2020-02-25 16:03:40', '2020-02-25 16:03:40', 1, 1, 7);
-INSERT INTO roles (id, roleConstant)
+INSERT INTO roles (id, role)
 VALUES (1, 'ROLE_USER');
-INSERT INTO roles (id, roleConstant)
+INSERT INTO roles (id, role)
 VALUES (2, 'ROLE_OWNER');
 INSERT INTO users (id, active, created_at, first_name, last_name, password, user_name) VALUES (1, false, '2020-02-24 20:05:17.903107000', 'Exchange', 'Owner', '$2a$10$E0w5a8z1UNCz4KAqW7W3M.odEDQkxXYI.gaL27RtdGyYUA8FKT5M.', 'exchange');
 INSERT INTO users_roles (user_id, role_id) VALUES (1, 2);
