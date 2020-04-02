@@ -11,8 +11,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Data
 @Entity
+@Getter
 @Table(name = "currency_rates")
 public class CurrencyRateEntity {
     @Id

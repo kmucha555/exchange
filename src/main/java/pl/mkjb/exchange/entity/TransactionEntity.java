@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Data
 @Entity
+@EqualsAndHashCode
 @Table(name = "transactions")
 public class TransactionEntity {
     @Id

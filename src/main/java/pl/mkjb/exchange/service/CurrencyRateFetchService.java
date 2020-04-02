@@ -33,6 +33,7 @@ public class CurrencyRateFetchService {
                 .onEmpty(() -> log.info("No new exchange rates has been published"));
     }
 
+
     private boolean hasNewCurrencyRatesBundleBeenPublished(CurrencyRatesModel currencyRatesModel) {
         return currencyRateRepository.countByPublicationDate(currencyRatesModel.getPublicationDate()) == 0;
     }

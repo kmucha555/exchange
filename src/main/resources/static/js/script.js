@@ -35,7 +35,7 @@ $(document).ready(function () {
                                 'code': element.code,
                                 'unit': unit,
                                 'sellPrice': sellPrice,
-                                'action': availableFunds > sellPrice * unit ?
+                                'action': availableFunds >= sellPrice ?
                                     `<a class="btn-sm btn-warning" href="/transaction/buy/${element.currencyRateId}">Buy</a>`
                                     : ``
                             }

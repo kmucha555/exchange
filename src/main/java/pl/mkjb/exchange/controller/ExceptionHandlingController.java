@@ -21,6 +21,7 @@ public class ExceptionHandlingController {
     @ExceptionHandler({IllegalArgumentException.class, NullPointerException.class})
     public String handle5xxException(HttpServletRequest request, RuntimeException exception) {
         log.error("Request: {} raised exception. Message: {}", request.getRequestURL(), exception.getMessage());
+        exception.printStackTrace();
         return "errors/500";
     }
 }
