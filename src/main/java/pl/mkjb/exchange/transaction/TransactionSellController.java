@@ -25,7 +25,7 @@ import static pl.mkjb.exchange.infrastructure.util.TransactionTypeConstant.SELL;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/transaction")
-public class TransactionSellController {
+class TransactionSellController {
     private static final String MESSAGE_SUCCESS = MessageConstant.MESSAGE_SUCCESS.name();
     private static final String MESSAGE_FAILED = MessageConstant.MESSAGE_FAILED.name();
     private static final String VIEW_NAME = "sell";

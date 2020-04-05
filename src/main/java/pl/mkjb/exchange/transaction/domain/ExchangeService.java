@@ -41,7 +41,7 @@ class ExchangeService {
         return (user, transaction) ->
                 TransactionEntity
                         .builder()
-                        .currencyEntity(transaction.getCurrencyRateEntity().getCurrencyEntity())
+                        .currencyEntity(CurrencyDto.toEntity(transaction.getCurrencyRateDto().getCurrencyDto()))
                         .userEntity(user)
                         .currencyRate(transaction.getTransactionPrice())
                         .amount(calculateTransactionAmountInTransactionCurrency().apply(user, transaction))
@@ -77,7 +77,7 @@ class ExchangeService {
         return (user, transaction) -> {
             val billingCurrencyTransactionAmount = transaction.getTransactionAmount()
                     .multiply(transaction.getTransactionPrice())
-                    .divide(transaction.getCurrencyRateEntity().getCurrencyEntity().getUnit(), HALF_UP);
+                    .divide(transaction.getCurrencyRateDto().getCurrencyDto().getUnit(), HALF_UP);
 
             return HashSet.ofAll(user.getRoles())
                     .filter(roleEntity -> roleEntity.getRole().equals(RoleConstant.ROLE_USER.name()))

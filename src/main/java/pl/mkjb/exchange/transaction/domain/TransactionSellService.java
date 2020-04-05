@@ -70,7 +70,7 @@ class TransactionSellService implements Transaction {
 
         currencyFacade.findCurrencyRateByCurrencyRateId(transactionDto.getCurrencyRateId())
                 .map(currency -> TransactionBuilder.builder()
-                        .currencyRateEntity(currencyFacade.from(currency))
+                        .currencyRateDto(currency)
                         .transactionAmount(transactionDto.getTransactionAmount())
                         .transactionPrice(currency.getPurchasePrice())
                         .userEntity(userEntity)

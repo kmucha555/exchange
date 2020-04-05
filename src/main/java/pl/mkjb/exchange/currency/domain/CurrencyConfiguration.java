@@ -11,6 +11,6 @@ class CurrencyConfiguration {
     CurrencyFacade currencyFacade(CurrencyRepository currencyRepository,
                                   CurrencyRateRepository currencyRateRepository) {
         val currencyRateCreator = new CurrencyRateCreator(currencyRepository);
-        return new CurrencyFacade(currencyRateCreator, currencyRepository, currencyRateRepository);
+        return new CurrencyFacade(currencyRateCreator, currencyRateRepository);
     }
 }

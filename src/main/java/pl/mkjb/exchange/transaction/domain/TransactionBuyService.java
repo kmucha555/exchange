@@ -74,7 +74,7 @@ class TransactionBuyService implements Transaction {
 
         currencyFacade.findCurrencyRateByCurrencyRateId(transactionDto.getCurrencyRateId())
                 .map(currency -> TransactionBuilder.builder()
-                        .currencyRateEntity(currencyFacade.from(currency))
+                        .currencyRateDto(currency)
                         .transactionAmount(transactionDto.getTransactionAmount().negate())
                         .transactionPrice(currency.getSellPrice())
                         .userEntity(userEntity)
