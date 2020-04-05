@@ -11,8 +11,8 @@
             <div class="p-5">
                 <div class="w-50 mx-auto">
                     <h3 class="text-success text-left mt-10">Register new user</h3>
-                    <!--/*@thymesVar id="userModel" type="pl.mkjb.exchange.model.UserModel"*/-->
-                    <form method="post" th:action="@{/register}" th:object="${userModel}">
+                    <!--/*@thymesVar id="userDto" type="pl.mkjb.exchange.user.dto.UserDto"*/-->
+                    <form method="post" th:action="@{/register}" th:object="${userDto}">
                         <div class="form-group">
                             <input class="form-control form-control-lg" type="text" th:field="*{userName}"
                                    th:value="*{userName}" placeholder="Username"/>

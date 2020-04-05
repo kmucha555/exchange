@@ -1,10 +1,10 @@
 package pl.mkjb.exchange.restclient;
 
 import io.vavr.control.Option;
-import pl.mkjb.exchange.model.CurrencyRatesModel;
+import pl.mkjb.exchange.restclient.dto.CurrencyFutureProcessingBundle;
 
 public interface RestClient {
-    Option<CurrencyRatesModel> getCurrenciesRates();
+    Option<CurrencyFutureProcessingBundle> getCurrenciesRates();
 
     boolean isConnectionAlive();
 }
