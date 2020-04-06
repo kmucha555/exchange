@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserService userService;
+    private final UserFacade userFacade;
 
     @Override
     public CustomUser loadUserByUsername(String username) {
-        val userEntity = userService.findByUsername(username);
+        val userEntity = userFacade.findByUsername(username);
         return CustomUser.buildCustomUser()
                 .id(userEntity.getId())
                 .username(userEntity.getUsername())

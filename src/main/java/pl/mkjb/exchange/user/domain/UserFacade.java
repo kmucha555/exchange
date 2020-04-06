@@ -19,30 +19,25 @@ import static pl.mkjb.exchange.infrastructure.util.RoleConstant.ROLE_USER;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserFacade {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    //    private final TransactionRepository transactionRepository;
-//    private final CurrencyFacade currencyFacade;
     private final PasswordEncoder passwordEncoder;
 
-    public boolean isGivenUserNameAlreadyUsed(UserDto userDto) {
+    public boolean isUserNameAlreadyUsed(UserDto userDto) {
         return userRepository.findByUsername(userDto.getUserName())
                 .map(userEntity -> userDto.getId() != userEntity.getId())
                 .getOrElse(false);
     }
 
     @Transactional
-    public void save(UserDto userDto) {
+    public UserEntity save(UserDto userDto) {
         val roleEntity = findRoleByName(ROLE_USER);
         val userEntity = UserEntity.fromModel(userDto);
         userEntity.setRoles(Set.of(roleEntity));
         userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-        val savedUserEntity = userRepository.save(userEntity);
-
-//        saveInitialTransactions(savedUserEntity);
-//        addFundsForUserForDemonstration(savedUserEntity);
+        return userRepository.save(userEntity);
     }
 
     public UserEntity findByUsername(String username) {
@@ -69,34 +64,4 @@ public class UserService {
                     throw new BadResourceException("User with {} not found" + roleConstant);
                 });
     }
-
-//    //Only for demo purpose
-//    private void saveInitialTransactions(UserEntity userEntity) {
-//        val transactionEntities = currencyFacade.findAll()
-//                .map(currencyEntity ->
-//                        TransactionEntity.builder()
-//                                .userEntity(userEntity)
-//                                .currencyEntity(currencyEntity)
-//                                .amount(BigDecimal.ZERO)
-//                                .currencyRate(BigDecimal.ONE)
-//                                .createdAt(LocalDateTime.now())
-//                                .build())
-//                .collect(Collectors.toUnmodifiableSet());
-//
-//        transactionRepository.saveAll(transactionEntities);
-//    }
-//
-//    //Only for demo purpose
-//    private void addFundsForUserForDemonstration(UserEntity userEntity) {
-//        val currencyEntity = currencyFacade.findBillingCurrency().getCurrencyEntity();
-//        val transactionEntity = TransactionEntity.builder()
-//                .userEntity(userEntity)
-//                .currencyEntity(currencyEntity)
-//                .amount(BigDecimal.valueOf(10000))
-//                .currencyRate(BigDecimal.ONE)
-//                .createdAt(LocalDateTime.now())
-//                .build();
-//
-//        transactionRepository.save(transactionEntity);
-//    }
 }

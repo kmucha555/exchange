@@ -10,7 +10,7 @@ import pl.mkjb.exchange.currency.dto.CurrencyRateDto;
 import pl.mkjb.exchange.infrastructure.CurrencyNotFoundException;
 import pl.mkjb.exchange.transaction.dto.TransactionBuilder;
 import pl.mkjb.exchange.transaction.dto.TransactionDto;
-import pl.mkjb.exchange.user.domain.UserService;
+import pl.mkjb.exchange.user.domain.UserFacade;
 import pl.mkjb.exchange.wallet.domain.WalletFacade;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ import static pl.mkjb.exchange.infrastructure.util.TransactionTypeConstant.SELL;
 class TransactionBuyService implements Transaction {
     private final WalletFacade walletFacade;
     private final CurrencyFacade currencyFacade;
-    private final UserService userService;
+    private final UserFacade userFacade;
     private final ExchangeService exchangeService;
     private final TransactionRepository transactionRepository;
 
@@ -55,7 +55,7 @@ class TransactionBuyService implements Transaction {
     }
 
     private BigDecimal calculateAvailableCurrency(CurrencyRateDto currencyRateDto) {
-        val userEntity = userService.findOwner();
+        val userEntity = userFacade.findOwner();
 
         return transactionRepository.sumCurrencyAmountForUser(userEntity.getId(), currencyRateDto.getCurrencyDto().getId())
                 .getOrElse(BigDecimal.ZERO);
@@ -70,7 +70,7 @@ class TransactionBuyService implements Transaction {
     @Override
     @Transactional
     public void saveTransaction(TransactionDto transactionDto, UserDetails userDetails) {
-        val userEntity = userService.findByUsername(userDetails.getUsername());
+        val userEntity = userFacade.findByUsername(userDetails.getUsername());
 
         currencyFacade.findCurrencyRateByCurrencyRateId(transactionDto.getCurrencyRateId())
                 .map(currency -> TransactionBuilder.builder()

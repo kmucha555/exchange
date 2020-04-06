@@ -12,7 +12,7 @@ import pl.mkjb.exchange.infrastructure.CurrencyNotFoundException;
 import pl.mkjb.exchange.infrastructure.util.RoleConstant;
 import pl.mkjb.exchange.transaction.dto.TransactionBuilder;
 import pl.mkjb.exchange.user.domain.UserEntity;
-import pl.mkjb.exchange.user.domain.UserService;
+import pl.mkjb.exchange.user.domain.UserFacade;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -22,11 +22,11 @@ import static java.math.RoundingMode.HALF_UP;
 @RequiredArgsConstructor
 class ExchangeService {
     private final CurrencyFacade currencyFacade;
-    private final UserService userService;
+    private final UserFacade userFacade;
     private final TransactionRepository transactionRepository;
 
     public Set<TransactionEntity> prepareTransactionToSave(TransactionBuilder transactionBuilder) {
-        final UserEntity exchangeOwnerEntity = userService.findOwner();
+        final UserEntity exchangeOwnerEntity = userFacade.findOwner();
         final UserEntity userEntity = transactionBuilder.getUserEntity();
 
         return Set.of(

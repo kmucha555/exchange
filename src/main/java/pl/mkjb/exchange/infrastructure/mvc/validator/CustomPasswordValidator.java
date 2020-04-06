@@ -1,12 +1,13 @@
 package pl.mkjb.exchange.infrastructure.mvc.validator;
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.passay.PasswordData;
 import org.passay.PasswordValidator;
+import org.passay.RuleResult;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 class CustomPasswordValidator implements ConstraintValidator<Password, String> {
@@ -14,7 +15,10 @@ class CustomPasswordValidator implements ConstraintValidator<Password, String> {
 
     @Override
     public boolean isValid(String passwordCandidate, ConstraintValidatorContext constraintValidatorContext) {
-        val passwordCandidateData = new PasswordData(passwordCandidate);
-        return passwordValidator.validate(passwordCandidateData).isValid();
+        return Optional.ofNullable(passwordCandidate)
+                .map(PasswordData::new)
+                .map(passwordValidator::validate)
+                .map(RuleResult::isValid)
+                .orElse(false);
     }
 }
