@@ -79,7 +79,9 @@ class TransactionSellController {
                 .accept(transactionDto, customUser);
 
         redirectAttributes.addFlashAttribute(MESSAGE_SUCCESS,
-                String.format("Success! You sold %s %s", transactionDto.getTransactionAmount(), transactionDto.getCurrencyCode()));
+                String.format("Success! You sold %s %s",
+                        transactionDto.getTransactionAmount(),
+                        transactionDto.getCurrencyCode()));
         return REDIRECT_URL;
     }
 }
