@@ -4,15 +4,19 @@ import io.vavr.collection.Set;
 import io.vavr.control.Option;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
-@Repository
-interface CurrencyRateRepository extends CrudRepository<CurrencyRateEntity, UUID> {
+//@Repository
+interface CurrencyRateRepository extends Repository<CurrencyRateEntity, UUID> {
+    Optional<CurrencyRateEntity> findById(UUID id);
+
+    Set<CurrencyRateEntity> saveAll(Set<CurrencyRateEntity> currencyRateEntities);
+
     Option<Long> countByPublicationDate(LocalDateTime publicationDate);
 
     @Query("select cr from CurrencyRateEntity cr where cr.active = true and cr.currencyEntity.billingCurrency = false")

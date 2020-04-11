@@ -7,6 +7,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 class CurrencyConfiguration {
 
+    CurrencyFacade currencyFacade() {
+        return currencyFacade(
+                new InMemoryCurrencyRepository(),
+                new InMemoryCurrencyRateRepository());
+    }
+
     @Bean
     CurrencyFacade currencyFacade(CurrencyRepository currencyRepository,
                                   CurrencyRateRepository currencyRateRepository) {

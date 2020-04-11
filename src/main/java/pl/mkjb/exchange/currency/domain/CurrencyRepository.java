@@ -1,10 +1,13 @@
 package pl.mkjb.exchange.currency.domain;
 
 import io.vavr.control.Option;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.Repository;
 
-@Repository
-interface CurrencyRepository extends JpaRepository<CurrencyEntity, Integer> {
+import java.util.Set;
+
+interface CurrencyRepository extends Repository<CurrencyEntity, Integer> {
+
+    Set<CurrencyEntity> findAll();
+
     Option<CurrencyEntity> findByCode(String currencyCode);
 }
