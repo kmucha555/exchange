@@ -1,15 +1,13 @@
 package pl.mkjb.exchange.currency.dto;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import pl.mkjb.exchange.currency.domain.CurrencyEntity;
 
 import java.math.BigDecimal;
 
 @Builder
-@Getter
-@EqualsAndHashCode
+@Data
 public class CurrencyDto {
     private final int id;
     private final String name;

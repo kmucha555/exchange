@@ -1,16 +1,14 @@
 package pl.mkjb.exchange.currency.dto;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
-@Getter
-@EqualsAndHashCode
+@Data
 public class CurrencyRateDto {
     private final UUID id;
     private final CurrencyDto currencyDto;

@@ -5,6 +5,7 @@ import io.vavr.collection.Set;
 import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import pl.mkjb.exchange.currency.dto.CurrencyRateDto;
 import pl.mkjb.exchange.infrastructure.CurrencyNotFoundException;
 import pl.mkjb.exchange.restclient.dto.CurrencyFutureProcessingBundle;
@@ -44,12 +45,16 @@ public class CurrencyFacade {
                 .orElseThrow(() -> new CurrencyNotFoundException(id));
     }
 
-    public Option<Iterable<CurrencyRateEntity>> processNewCurrencyRates(CurrencyFutureProcessingBundle currencyFutureProcessingBundle) {
-        return currencyRateRepository.countByPublicationDate(currencyFutureProcessingBundle.getPublicationDate())
+    public Set<CurrencyRateEntity> processNewCurrencyRates(CurrencyFutureProcessingBundle currencyFutureProcessingBundle) {
+        val publicationDate = currencyFutureProcessingBundle.getPublicationDate();
+
+        return currencyRateRepository.countByPublicationDate(publicationDate)
                 .filter(count -> count == 0)
                 .peek(count -> currencyRateRepository.archiveCurrencyRates())
                 .map(count -> currencyRateCreator.from(currencyFutureProcessingBundle))
-                .map(currencyRateRepository::saveAll);
+                .peek(currencyRateRepository::saveAll)
+                .getOrElse(HashSet.empty())
+                .toSet();
     }
 
     //Only for demo purpose

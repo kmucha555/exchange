@@ -16,7 +16,7 @@ class CurrencyRateFetchService {
     @Scheduled(fixedRateString = "${pl.mkjb.exchange.restclient.dto.CurrencyRateFetchService.fixedDelay.in.milliseconds}")
     public void updateCurrenciesRates() {
         futureProcessingRestClient.getCurrenciesRates()
-                .flatMap(currencyFacade::processNewCurrencyRates)
+                .map(currencyFacade::processNewCurrencyRates)
                 .peek(currencyRates -> log.info("New currency rates has been published."))
                 .peek(currencyRates -> log.info("Following currency rates has been saved: {}", currencyRates))
                 .onEmpty(() -> log.info("No new currency rates has been published since last fetch."));

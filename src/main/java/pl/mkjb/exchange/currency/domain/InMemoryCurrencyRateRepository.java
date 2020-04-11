@@ -102,6 +102,7 @@ class InMemoryCurrencyRateRepository implements CurrencyRateRepository {
     public io.vavr.collection.Set<CurrencyRateEntity> findByActiveTrue() {
         return currencyRates.values()
                 .filter(currencyRate -> currencyRate.getActive().equals(Boolean.TRUE))
+                .filter(currencyRate -> currencyRate.getCurrencyEntity().getBillingCurrency().equals(Boolean.FALSE))
                 .toSet();
     }
 
