@@ -16,6 +16,8 @@
 
     <properties>
         <java.version>11</java.version>
+        <groovy-all.version>3.0.0</groovy-all.version>
+        <spock.version>2.0-M2-groovy-3.0</spock.version>
         <vavr.version>0.10.2</vavr.version>
         <passay.version>1.5.0</passay.version>
         <awaitility.version>3.1.6</awaitility.version>
@@ -23,20 +25,7 @@
         <datatables.version>1.10.20</datatables.version>
         <bootstrap.version>4.4.1</bootstrap.version>
         <jquery.version>3.3.1</jquery.version>
-        <spock.version>2.0-M2-groovy-3.0</spock.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.spockframework</groupId>
-                <artifactId>spock-bom</artifactId>
-                <version>${spock.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -85,6 +74,17 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>io.vavr</groupId>
+            <artifactId>vavr</artifactId>
+            <version>${vavr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.passay</groupId>
+            <artifactId>passay</artifactId>
+            <version>${passay.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -107,15 +107,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.vavr</groupId>
-            <artifactId>vavr</artifactId>
-            <version>${vavr.version}</version>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <scope>test</scope>
+            <version>${spock.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.passay</groupId>
-            <artifactId>passay</artifactId>
-            <version>${passay.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>font-awesome</artifactId>
@@ -135,21 +132,6 @@
             <groupId>org.webjars.bower</groupId>
             <artifactId>jquery</artifactId>
             <version>${jquery.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.spockframework</groupId>
-            <artifactId>spock-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spockframework</groupId>
-            <artifactId>spock-junit4</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <version>3.0.3</version>
         </dependency>
     </dependencies>
 
@@ -173,6 +155,15 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-all</artifactId>
+                        <version>${groovy-all.version}</version>
+                        <scope>runtime</scope>
+                        <type>pom</type>
+                    </dependency>
+                </dependencies>
             </plugin>
 
         </plugins>

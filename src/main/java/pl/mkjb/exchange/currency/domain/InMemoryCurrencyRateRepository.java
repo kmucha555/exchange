@@ -2,11 +2,11 @@ package pl.mkjb.exchange.currency.domain;
 
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
-import io.vavr.collection.Set;
 import io.vavr.control.Option;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 class InMemoryCurrencyRateRepository implements CurrencyRateRepository {
@@ -18,7 +18,7 @@ class InMemoryCurrencyRateRepository implements CurrencyRateRepository {
     }
 
     @Override
-    public Set<CurrencyRateEntity> saveAll(Set<CurrencyRateEntity> currencyRateEntities) {
+    public Set<CurrencyRateEntity> saveAll(Iterable<CurrencyRateEntity> currencyRateEntities) {
         return null;
     }
 
@@ -28,7 +28,7 @@ class InMemoryCurrencyRateRepository implements CurrencyRateRepository {
     }
 
     @Override
-    public Set<CurrencyRateEntity> findByActiveTrue() {
+    public io.vavr.collection.Set<CurrencyRateEntity> findByActiveTrue() {
         return null;
     }
 
