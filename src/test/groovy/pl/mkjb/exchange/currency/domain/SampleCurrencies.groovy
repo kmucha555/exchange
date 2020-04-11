@@ -1,62 +1,37 @@
 package pl.mkjb.exchange.currency.domain
 
-import groovy.transform.CompileStatic
-import pl.mkjb.exchange.currency.dto.CurrencyDto
-import pl.mkjb.exchange.currency.dto.CurrencyRateDto
+import io.vavr.collection.HashMap
+import io.vavr.collection.Map
 
-@CompileStatic
 trait SampleCurrencies {
-    CurrencyDto billingCurrency = createCurrencyDto(1, "Polish Zloty", "PLN", BigDecimal.ONE, true)
-    CurrencyDto usdCurrency = createCurrencyDto(2, "US Dollar", "USD", BigDecimal.ONE, false)
-    CurrencyDto czkCurrency = createCurrencyDto(3, "Czech koruna", "CZK", BigDecimal.valueOf(100), false)
+    Map<Integer, CurrencyEntity> currencies =
+            HashMap.of(
+                    1, pln,
+                    2, usd,
+                    3, czk
+            )
 
-    CurrencyRateDto billingCurrencyRate =
-            createCurrencyRateDto(
-                    billingCurrency,
-                    BigDecimal.ONE,
-                    BigDecimal.ONE,
-                    true)
+    CurrencyEntity pln = CurrencyEntity.builder()
+            .id(1)
+            .name("Polish Zloty")
+            .code("PLN")
+            .unit(BigDecimal.ONE)
+            .billingCurrency(true)
+            .build()
 
-    CurrencyRateDto UsdCurrencyRate =
-            createCurrencyRateDto(
-                    usdCurrency,
-                    BigDecimal.valueOf(3.9598d),
-                    BigDecimal.valueOf(3.9895d),
-                    true)
+    CurrencyEntity usd = CurrencyEntity.builder()
+            .id(2)
+            .name("US Dollar")
+            .code("USD")
+            .unit(BigDecimal.ONE)
+            .billingCurrency(false)
+            .build()
 
-    CurrencyRateDto CzkCurrencyRate =
-            createCurrencyRateDto(
-                    czkCurrency,
-                    BigDecimal.valueOf(14.5678d),
-                    BigDecimal.valueOf(14.7890d),
-                    true)
-
-    static private createCurrencyRateDto(CurrencyDto currencyDto,
-                                         BigDecimal purchasePrice,
-                                         BigDecimal sellPrice,
-                                         boolean active) {
-
-        return CurrencyRateDto.builder()
-                .id(UUID.randomUUID())
-                .currencyDto(currencyDto)
-                .purchasePrice(purchasePrice)
-                .sellPrice(sellPrice)
-                .active(active)
-                .build()
-    }
-
-    static private createCurrencyDto(int id,
-                                     String name,
-                                     String code,
-                                     BigDecimal unit,
-                                     boolean billingCurrency) {
-
-        return CurrencyDto.builder()
-                .id(id)
-                .name(name)
-                .code(code)
-                .unit(unit)
-                .billingCurrency(billingCurrency)
-                .build()
-    }
+    CurrencyEntity czk = CurrencyEntity.builder()
+            .id(3)
+            .name("Czech koruna")
+            .code("CZK")
+            .unit(BigDecimal.valueOf(100))
+            .billingCurrency(false)
+            .build()
 }

@@ -1,6 +1,7 @@
 package pl.mkjb.exchange.currency.dto;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 @Builder
 @Getter
+@EqualsAndHashCode
 public class CurrencyRateDto {
     private final UUID id;
     private final CurrencyDto currencyDto;
