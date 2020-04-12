@@ -11,13 +11,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-//@Repository
 interface CurrencyRateRepository extends Repository<CurrencyRateEntity, UUID> {
     Optional<CurrencyRateEntity> findById(UUID id);
 
     Set<CurrencyRateEntity> saveAll(Iterable<CurrencyRateEntity> currencyRateEntities);
 
-    Option<Long> countByPublicationDate(LocalDateTime publicationDate);
+    int countByPublicationDate(LocalDateTime publicationDate);
 
     @Query("select cr from CurrencyRateEntity cr where cr.active = true and cr.currencyEntity.billingCurrency = false")
     io.vavr.collection.Set<CurrencyRateEntity> findByActiveTrue();

@@ -19,6 +19,7 @@ class CurrencyRateCreator {
                 .averagePrice(currencyRateDto.getAveragePrice())
                 .purchasePrice(currencyRateDto.getPurchasePrice())
                 .sellPrice(currencyRateDto.getSellPrice())
+                .active(Boolean.TRUE)
                 .publicationDate(currencyRateDto.getPublicationDate())
                 .build();
     }
@@ -31,6 +32,7 @@ class CurrencyRateCreator {
                                 .averagePrice(currency.getAveragePrice())
                                 .purchasePrice(currency.getPurchasePrice())
                                 .sellPrice(currency.getSellPrice())
+                                .active(Boolean.TRUE)
                                 .publicationDate(currencyFutureProcessingBundle.getPublicationDate())
                                 .build())
                 .toSet();

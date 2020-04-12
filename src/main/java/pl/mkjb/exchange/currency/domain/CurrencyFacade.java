@@ -14,7 +14,9 @@ import pl.mkjb.exchange.user.domain.UserEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,16 +47,23 @@ public class CurrencyFacade {
                 .orElseThrow(() -> new CurrencyNotFoundException(id));
     }
 
-    public Set<CurrencyRateEntity> processNewCurrencyRates(CurrencyFutureProcessingBundle currencyFutureProcessingBundle) {
-        val publicationDate = currencyFutureProcessingBundle.getPublicationDate();
+    public Set<CurrencyRateDto> processNewCurrencyRates(CurrencyFutureProcessingBundle currencyFutureProcessingBundle) {
+        return HashSet.ofAll(
+                currencyFutureProcessingBundle.getItems()
+                        .stream()
+                        .filter(currency -> isNewCurrencyRatesPublicationAvailable(currencyFutureProcessingBundle))
+                        .peek(currencies -> currencyRateRepository.archiveCurrencyRates())
+                        .map(count -> currencyRateCreator.from(currencyFutureProcessingBundle))
+                        .map(currencyRateRepository::saveAll)
+                        .flatMap(Collection::stream)
+                        .map(CurrencyRateEntity::toDto)
+                        .collect(Collectors.toSet())
+        );
+    }
 
-        return currencyRateRepository.countByPublicationDate(publicationDate)
-                .filter(count -> count == 0)
-                .peek(count -> currencyRateRepository.archiveCurrencyRates())
-                .map(count -> currencyRateCreator.from(currencyFutureProcessingBundle))
-                .peek(currencyRateRepository::saveAll)
-                .getOrElse(HashSet.empty())
-                .toSet();
+    public boolean isNewCurrencyRatesPublicationAvailable(CurrencyFutureProcessingBundle currencyFutureProcessingBundle) {
+        val publicationDate = currencyFutureProcessingBundle.getPublicationDate();
+        return currencyRateRepository.countByPublicationDate(publicationDate) == 0;
     }
 
     //Only for demo purpose

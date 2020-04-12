@@ -48,7 +48,6 @@ class CurrencyRateEntity {
 
     @PrePersist
     void prePersist() {
-        this.active = Boolean.TRUE;
         this.createdAt = LocalDateTime.now();
     }
 

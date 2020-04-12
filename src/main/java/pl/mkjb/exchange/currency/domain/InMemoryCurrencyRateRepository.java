@@ -17,36 +17,37 @@ class InMemoryCurrencyRateRepository implements CurrencyRateRepository {
 
     {
         val publicationDate = LocalDateTime.of(2020, 4, 11, 14, 3, 1);
-        val PLN_UUID = "f7086c16-87bc-4a02-9fe5-146a9f4b6bbe";
-        val USD_UUID = "db64b6bc-f5e4-4eb8-9d53-5529f0691896";
-        val CZK_UUID = "d1d1570a-f705-41ef-98d9-fb5c1a01c71d";
+
+        val plnUUID = UUID.fromString("f7086c16-87bc-4a02-9fe5-146a9f4b6bbe");
+        val usdUUID = UUID.fromString("db64b6bc-f5e4-4eb8-9d53-5529f0691896");
+        val czkUUID = UUID.fromString("d1d1570a-f705-41ef-98d9-fb5c1a01c71d");
+
+        val plnName = "Polish Zloty";
+        val plnCode = "PLN";
+        val plnUnit = BigDecimal.ONE;
+
+        val usdName = "US Dollar";
+        val usdCode = "USD";
+        val usdUnit = BigDecimal.ONE;
+        val usdPurchasePrice = BigDecimal.valueOf(4d);
+        val usdSellPrice = BigDecimal.valueOf(4.5d);
+
+        val czkName = "Czech koruna";
+        val czkCode = "CZK";
+        val czkUnit = BigDecimal.valueOf(100);
+        val czkPurchasePrice = BigDecimal.valueOf(14d);
+        val czkSellPrice = BigDecimal.valueOf(14.5d);
 
         val pln = CurrencyEntity.builder()
                 .id(1)
-                .name("Polish Zloty")
-                .code("PLN")
-                .unit(BigDecimal.ONE)
+                .name(plnName)
+                .code(plnCode)
+                .unit(plnUnit)
                 .billingCurrency(true)
                 .build();
 
-        val usd = CurrencyEntity.builder()
-                .id(2)
-                .name("US Dollar")
-                .code("USD")
-                .unit(BigDecimal.ONE)
-                .billingCurrency(false)
-                .build();
-
-        val czk = CurrencyEntity.builder()
-                .id(3)
-                .name("Czech koruna")
-                .code("CZK")
-                .unit(BigDecimal.valueOf(100))
-                .billingCurrency(false)
-                .build();
-
         val currencyRatePLN = CurrencyRateEntity.builder()
-                .id(UUID.fromString(PLN_UUID))
+                .id(plnUUID)
                 .currencyEntity(pln)
                 .purchasePrice(BigDecimal.ONE)
                 .sellPrice(BigDecimal.ONE)
@@ -54,31 +55,46 @@ class InMemoryCurrencyRateRepository implements CurrencyRateRepository {
                 .publicationDate(publicationDate)
                 .build();
 
+        val usd = CurrencyEntity.builder()
+                .id(2)
+                .name(usdName)
+                .code(usdCode)
+                .unit(usdUnit)
+                .billingCurrency(false)
+                .build();
+
         val currencyRateUSD = CurrencyRateEntity.builder()
-                .id(UUID.fromString(USD_UUID))
+                .id(usdUUID)
                 .currencyEntity(usd)
-                .purchasePrice(BigDecimal.valueOf(3.9598d))
-                .sellPrice(BigDecimal.valueOf(3.9895d))
+                .purchasePrice(usdPurchasePrice)
+                .sellPrice(usdSellPrice)
                 .active(true)
                 .publicationDate(publicationDate)
                 .build();
 
+        val czk = CurrencyEntity.builder()
+                .id(3)
+                .name(czkName)
+                .code(czkCode)
+                .unit(czkUnit)
+                .billingCurrency(false)
+                .build();
+
         val currencyRateCZK = CurrencyRateEntity.builder()
-                .id(UUID.fromString(CZK_UUID))
+                .id(czkUUID)
                 .currencyEntity(czk)
-                .purchasePrice(BigDecimal.valueOf(14.5678d))
-                .sellPrice(BigDecimal.valueOf(14.7890d))
+                .purchasePrice(czkPurchasePrice)
+                .sellPrice(czkSellPrice)
                 .active(true)
                 .publicationDate(publicationDate)
                 .build();
 
         currencyRates = HashMap.of(
-                UUID.fromString(PLN_UUID), currencyRatePLN,
-                UUID.fromString(USD_UUID), currencyRateUSD,
-                UUID.fromString(CZK_UUID), currencyRateCZK
+                plnUUID, currencyRatePLN,
+                usdUUID, currencyRateUSD,
+                czkUUID, currencyRateCZK
         );
     }
-
 
     @Override
     public Optional<CurrencyRateEntity> findById(UUID id) {
@@ -92,10 +108,9 @@ class InMemoryCurrencyRateRepository implements CurrencyRateRepository {
     }
 
     @Override
-    public Option<Long> countByPublicationDate(LocalDateTime publicationDate) {
-        return Option.of(currencyRates.values()
-                .count(currencyRate -> currencyRate.getPublicationDate().isEqual(publicationDate)))
-                .map(Long::valueOf);
+    public int countByPublicationDate(LocalDateTime publicationDate) {
+        return currencyRates.values()
+                .count(currencyRate -> currencyRate.getPublicationDate().isEqual(publicationDate));
     }
 
     @Override

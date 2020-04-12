@@ -10,7 +10,8 @@ class CurrencyConfiguration {
     CurrencyFacade currencyFacade() {
         return currencyFacade(
                 new InMemoryCurrencyRepository(),
-                new InMemoryCurrencyRateRepository());
+                new InMemoryCurrencyRateRepository()
+        );
     }
 
     @Bean
