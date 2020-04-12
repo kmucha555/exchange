@@ -2,19 +2,16 @@ package pl.mkjb.exchange.wallet.domain;
 
 import io.vavr.collection.Set;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.mkjb.exchange.currency.domain.CurrencyFacade;
 import pl.mkjb.exchange.currency.dto.CurrencyRateDto;
 import pl.mkjb.exchange.infrastructure.CurrencyNotFoundException;
-import pl.mkjb.exchange.infrastructure.mvc.exception.BadResourceException;
 import pl.mkjb.exchange.wallet.dto.UserWalletDto;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Slf4j
 @RequiredArgsConstructor
 class WalletService {
     private final CurrencyFacade currencyFacade;
@@ -54,7 +51,7 @@ class WalletService {
             val code = currencyRate.getCurrencyDto().getCode();
             return code.equals(userWalletDto.getCode());
         })
-                .getOrElseThrow(() -> new BadResourceException("There's no currency with given code " + userWalletDto.getCode()));
+                .getOrElseThrow(() -> new CurrencyNotFoundException("There's no currency with given code " + userWalletDto.getCode()));
     }
 
     public BigDecimal getUserWalletAmountForGivenCurrency(UUID currencyId, UserDetails userDetails) {

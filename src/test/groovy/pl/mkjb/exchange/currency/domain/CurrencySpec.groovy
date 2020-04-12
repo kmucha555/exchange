@@ -39,7 +39,7 @@ class CurrencySpec extends Specification implements SampleCurrencies {
         when: "facade is asked for unknown currency rate"
         facade.isArchivedCurrencyRate(randomUUID)
 
-        then:
+        then: "currency not found exception is thrown"
         thrown(CurrencyNotFoundException)
     }
 

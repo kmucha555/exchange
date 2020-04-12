@@ -8,6 +8,11 @@ import pl.mkjb.exchange.currency.domain.CurrencyFacade;
 @Configuration
 class WalletConfiguration {
 
+    WalletFacade walletFacade(CurrencyFacade currencyFacade) {
+        final WalletRepository inMemoryWalletRepository = new InMemoryWalletRepository();
+        return walletFacade(currencyFacade, inMemoryWalletRepository);
+    }
+
     @Bean
     WalletFacade walletFacade(CurrencyFacade currencyFacade, WalletRepository walletRepository) {
         val walletService = new WalletService(currencyFacade, walletRepository);

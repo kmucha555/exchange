@@ -67,12 +67,13 @@ trait SampleCurrencies {
             .billingCurrency(false)
             .build()
 
-    CurrencyRateDto UsdCurrencyRate =
+    CurrencyRateDto usdCurrencyRate =
             CurrencyRateDto.builder()
                     .id(usdUUID)
                     .currencyDto(usdCurrency)
                     .purchasePrice(usdPurchasePrice)
                     .sellPrice(usdSellPrice)
+                    .averagePrice(usdAveragePrice)
                     .active(true)
                     .publicationDate(publicationDate)
                     .build()
@@ -85,12 +86,13 @@ trait SampleCurrencies {
             .billingCurrency(false)
             .build()
 
-    CurrencyRateDto CzkCurrencyRate =
+    CurrencyRateDto czkCurrencyRate =
             CurrencyRateDto.builder()
                     .id(czkUUID)
                     .currencyDto(czkCurrency)
                     .purchasePrice(czkPurchasePrice)
                     .sellPrice(czkSellPrice)
+                    .averagePrice(czkAveragePrice)
                     .active(true)
                     .publicationDate(publicationDate)
                     .build()
