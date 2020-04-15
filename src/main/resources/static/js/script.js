@@ -24,19 +24,20 @@ $(document).ready(function () {
                 url: window.location.href + '/currencies',
                 dataSrc: json => {
                     const returnData = [];
-                    publicationDate = new Date(json.publicationDate);
-                    $('#lastUpdate').html(`Last update: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}`);
-                    json.items.forEach(element => {
+
+                    json.forEach(element => {
                         const sellPrice = parseFloat(element.sellPrice.toFixed(4));
-                        const unit = parseInt(element.unit);
+                        const unit = parseInt(element.currencyDto.unit);
                         const availableFunds = parseFloat($('#funds').text());
+                        publicationDate = new Date(element.publicationDate);
+                        $('#lastUpdate').html(`Last update: ${publicationDate.toLocaleDateString()} ${publicationDate.toLocaleTimeString()}`);
                         returnData.push(
                             {
-                                'code': element.code,
+                                'code': element.currencyDto.code,
                                 'unit': unit,
                                 'sellPrice': sellPrice,
                                 'action': availableFunds >= sellPrice ?
-                                    `<a class="btn-sm btn-warning" href="/transaction/buy/${element.currencyRateId}">Buy</a>`
+                                    `<a class="btn-sm btn-warning" href="/transaction/buy/${element.id}">Buy</a>`
                                     : ``
                             }
                         )

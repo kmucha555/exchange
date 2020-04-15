@@ -9,16 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import pl.mkjb.exchange.exception.BadResourceException;
-import pl.mkjb.exchange.exception.RestTemplateResponseErrorHandler;
-import pl.mkjb.exchange.model.CurrencyRatesModel;
+import pl.mkjb.exchange.infrastructure.mvc.exception.BadResourceException;
+import pl.mkjb.exchange.infrastructure.mvc.exception.RestTemplateResponseErrorHandler;
+import pl.mkjb.exchange.restclient.dto.CurrencyFutureProcessingBundle;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FutureProcessingRestClient implements RestClient {
+class FutureProcessingRestClient implements RestClient {
     private final AtomicBoolean activeConnection = new AtomicBoolean(false);
     private final RestTemplate restTemplate;
 
@@ -26,17 +26,17 @@ public class FutureProcessingRestClient implements RestClient {
     private String currencyRatesUrl;
 
     @Override
-    public Option<CurrencyRatesModel> getCurrenciesRates() {
+    public Option<CurrencyFutureProcessingBundle> getCurrenciesRates() {
         try {
 
             this.restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
-            final ResponseEntity<CurrencyRatesModel> currencyRatesModelResponseEntity =
-                    restTemplate.getForEntity(currencyRatesUrl, CurrencyRatesModel.class);
+            final ResponseEntity<CurrencyFutureProcessingBundle> currencyRatesModelResponseEntity =
+                    restTemplate.getForEntity(currencyRatesUrl, CurrencyFutureProcessingBundle.class);
             activeConnection.set(true);
 
             return Option.of(currencyRatesModelResponseEntity)
                     .map(HttpEntity::getBody)
-                    .peek(currencyRatesModel -> log.info("Rest Client response body {}", currencyRatesModel));
+                    .peek(fetchedCurrencyRates -> log.info("Fetched currency rates {}", fetchedCurrencyRates));
 
         } catch (RestClientException e) {
             activeConnection.set(false);
